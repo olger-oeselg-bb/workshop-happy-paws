@@ -18,25 +18,7 @@ async function start() {
 start().catch(err => { console.error('Failed to start server', err); process.exit(1) })
 
 app.use('/', express.static(path.join(__dirname, 'static')))
-
-// APIs
-app.get('/api/pets', async (req, res) => {
-  const pets = await getPets()
-  res.json(pets)
-})
-
-app.post('/api/pets', async (req, res) => {
-  const { name, type, breed, age, gender, status, photoUrl } = req.body
-  if (!name || !type || !photoUrl) {
-    return res.status(400).json({ error: 'name, type and photoUrl are required' })
-  }
-  const pet = await addPet({ name, type, breed: breed || '', age: age || null, gender: gender || 'Unknown', status: status || 'In Shelter', photoUrl })
-  res.status(201).json(pet)
-})
-
-app.post('/api/reset', async (req, res) => {
-  await resetDb()
-  res.json({ status: 'ok' })
-})
+const apiRouter = require('./src/router')
+app.use('/api', apiRouter)
 
 // server started in start()
