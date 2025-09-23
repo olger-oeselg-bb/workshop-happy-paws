@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const { getPets, getPet, addPet, resetDb } = require('./db')
+const { getPets, getPet, addPet, updatePet, resetDb } = require('./db')
 const logger = require('./logger')
 
 router.get('/pets', async (req, res) => {
@@ -33,7 +33,7 @@ router.post('/pets', async (req, res) => {
     const pet = await addPet({ name, type, breed: breed || '', age: age || null, gender: gender || 'Unknown', status: status || 'In Shelter', photoUrl })
     res.status(201).json(pet)
   } catch (err) {
-    console.error('POST /pets error', err)
+    logger.error({ err }, 'POST /pets error')
     res.status(500).json({ error: 'internal' })
   }
 })
@@ -43,7 +43,22 @@ router.post('/reset', async (req, res) => {
     await resetDb()
     res.json({ status: 'ok' })
   } catch (err) {
-    console.error('POST /reset error', err)
+    logger.error({ err }, 'POST /reset error')
+    res.status(500).json({ error: 'internal' })
+  }
+})
+
+// Update pet (status changes allowed)
+router.patch('/pets/:id', async (req, res) => {
+  try {
+    const { status } = req.body
+    const allowed = ['In Shelter', 'Pending Adoption', 'Adopted', 'Not Available']
+    if (!status || !allowed.includes(status)) return res.status(400).json({ error: 'invalid_status' })
+    const updated = await updatePet(req.params.id, { status })
+    if (!updated) return res.status(404).json({ error: 'not_found' })
+    res.json(updated)
+  } catch (err) {
+    logger.error({ err }, 'PATCH /pets/:id error')
     res.status(500).json({ error: 'internal' })
   }
 })

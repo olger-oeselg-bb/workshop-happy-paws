@@ -25,6 +25,18 @@ createApp({
       }
     }
 
+      const updateStatus = async (id, newStatus) => {
+        const res = await fetch(`/api/pets/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: newStatus }) })
+        if (res.status === 200) {
+          const updated = await res.json()
+          currentPet.value = updated
+          await load()
+        } else {
+          const err = await res.json()
+          message.value = err.error || 'Error updating status'
+        }
+      }
+
     const navigateTo = (hash) => {
       // treat empty hash, '#' or '#/' as the home (list) view
       if (!hash || hash === '#' || hash === '#/') {
@@ -87,7 +99,7 @@ createApp({
       navigateTo(location.hash)
     })
 
-    return { pets, form, message, submit, view, currentPet, navigateTo, openPet, goHome }
+    return { pets, form, message, submit, view, currentPet, navigateTo, openPet, goHome, updateStatus }
   },
   template: `
     <div class="container">
@@ -131,7 +143,15 @@ createApp({
             <p><strong>Breed:</strong> {{currentPet.breed}}</p>
             <p><strong>Age:</strong> {{currentPet.age}}</p>
             <p><strong>Gender:</strong> {{currentPet.gender}}</p>
-            <p><strong>Status:</strong> {{currentPet.status}}</p>
+            <p>
+              <strong>Status:</strong>
+              <select :value="currentPet.status" @change="(e)=> updateStatus(currentPet.id, e.target.value)">
+                <option>In Shelter</option>
+                <option>Pending Adoption</option>
+                <option>Adopted</option>
+                <option>Not Available</option>
+              </select>
+            </p>
             <p><small>Added: {{currentPet.createdAt}}</small></p>
           </div>
           <div v-else>

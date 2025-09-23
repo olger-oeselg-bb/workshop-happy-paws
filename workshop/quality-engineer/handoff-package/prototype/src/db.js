@@ -36,4 +36,14 @@ async function resetDb() {
   await db.write()
 }
 
-module.exports = { initDb, getPets, getPet, addPet, resetDb }
+async function updatePet(id, changes) {
+  await db.read()
+  const pid = typeof id === 'string' ? parseInt(id, 10) : id
+  const idx = db.data.pets.findIndex(p => p.id === pid)
+  if (idx === -1) return null
+  db.data.pets[idx] = { ...db.data.pets[idx], ...changes }
+  await db.write()
+  return db.data.pets[idx]
+}
+
+module.exports = { initDb, getPets, getPet, addPet, updatePet, resetDb }
