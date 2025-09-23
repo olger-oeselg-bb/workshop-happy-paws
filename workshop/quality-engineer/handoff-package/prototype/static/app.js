@@ -83,6 +83,13 @@ createApp({
         return
       }
 
+      // add pet route
+      if (hash === '#/add') {
+        view.value = 'add'
+        currentPet.value = null
+        return
+      }
+
       // unknown route: fallback to list
       view.value = 'list'
       currentPet.value = null
@@ -119,6 +126,8 @@ createApp({
       }
     }
 
+    const goToAdd = () => { location.hash = '#/add' }
+
     // handle back/forward
     window.addEventListener('popstate', () => navigateTo(location.hash))
     window.addEventListener('hashchange', () => navigateTo(location.hash))
@@ -128,27 +137,18 @@ createApp({
       navigateTo(location.hash)
     })
 
-    return { pets, form, message, submit, view, currentPet, navigateTo, openPet, goHome, updateStatus, medicalRecords, medForm, addMedical, loadMedical }
+    return { pets, form, message, submit, view, currentPet, navigateTo, openPet, goHome, goToAdd, updateStatus, medicalRecords, medForm, addMedical, loadMedical }
   },
   template: `
     <div class="container">
       <h1>Happy Paws — Prototype</h1>
 
       <template v-if="view==='list'">
-        <section class="form">
-          <h2>Add Pet</h2>
-          <div class="field"><label>Name</label><input v-model="form.name" /></div>
-          <div class="field"><label>Type</label><select v-model="form.type"><option>Dog</option><option>Cat</option><option>Other</option></select></div>
-          <div class="field"><label>Breed</label><input v-model="form.breed" /></div>
-          <div class="field"><label>Age</label><input v-model="form.age" /></div>
-          <div class="field"><label>Gender</label><select v-model="form.gender"><option>Unknown</option><option>Male</option><option>Female</option></select></div>
-          <div class="field"><label>Photo URL</label><input v-model="form.photoUrl" placeholder="https://..." /></div>
-          <div class="actions"><button @click="submit">Save</button></div>
-          <div class="message" aria-live="polite">{{message}}</div>
-        </section>
-
         <section class="list">
-          <h2>Pets</h2>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <h2>Pets</h2>
+            <div class="actions"><button @click="goToAdd">Add Pet</button></div>
+          </div>
           <div v-if="pets.length===0">No pets yet.</div>
           <div class="cards">
             <div class="card" v-for="p in pets" :key="p.id" @click="openPet(p)">
@@ -160,6 +160,20 @@ createApp({
               </div>
             </div>
           </div>
+        </section>
+      </template>
+
+      <template v-else-if="view==='add'">
+        <section class="form">
+          <h2>Add Pet</h2>
+          <div class="field"><label>Name</label><input v-model="form.name" /></div>
+          <div class="field"><label>Type</label><select v-model="form.type"><option>Dog</option><option>Cat</option><option>Other</option></select></div>
+          <div class="field"><label>Breed</label><input v-model="form.breed" /></div>
+          <div class="field"><label>Age</label><input v-model="form.age" /></div>
+          <div class="field"><label>Gender</label><select v-model="form.gender"><option>Unknown</option><option>Male</option><option>Female</option></select></div>
+          <div class="field"><label>Photo URL</label><input v-model="form.photoUrl" placeholder="https://..." /></div>
+          <div class="actions"><button @click="submit">Save</button> <button @click="goHome">Cancel</button></div>
+          <div class="message" aria-live="polite">{{message}}</div>
         </section>
       </template>
 
