@@ -18,12 +18,39 @@ createApp({
       if (res.status === 200) {
         currentPet.value = await res.json()
         view.value = 'profile'
+        // load medical records for this pet
+        await loadMedical(id)
       } else {
         currentPet.value = null
         message.value = 'Pet not found.'
         view.value = 'list'
       }
     }
+
+      const medicalRecords = ref([])
+      const medForm = ref({ notes: '', vet: '', date: '', type: 'note' })
+
+      const loadMedical = async (petId) => {
+        const res = await fetch(`/api/pets/${petId}/medical-records`)
+        if (res.status === 200) {
+          medicalRecords.value = await res.json()
+        } else {
+          medicalRecords.value = []
+        }
+      }
+
+      const addMedical = async (petId) => {
+        if (!medForm.value.notes) { message.value = 'Notes required'; return }
+        const res = await fetch(`/api/pets/${petId}/medical-records`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(medForm.value) })
+        if (res.status === 201) {
+          const rec = await res.json()
+          medicalRecords.value.push(rec)
+          medForm.value = { notes: '', vet: '', date: '', type: 'note' }
+        } else {
+          const err = await res.json()
+          message.value = err.error || 'Error adding record'
+        }
+      }
 
       const updateStatus = async (id, newStatus) => {
         const res = await fetch(`/api/pets/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: newStatus }) })
@@ -42,6 +69,8 @@ createApp({
       if (!hash || hash === '#' || hash === '#/') {
         view.value = 'list'
         currentPet.value = null
+        // clear medical records when returning home
+        medicalRecords.value = []
         // ensure the canonical hash is '#/'
         if (location.hash !== '#/') location.replace('#/')
         return
@@ -99,7 +128,7 @@ createApp({
       navigateTo(location.hash)
     })
 
-    return { pets, form, message, submit, view, currentPet, navigateTo, openPet, goHome, updateStatus }
+    return { pets, form, message, submit, view, currentPet, navigateTo, openPet, goHome, updateStatus, medicalRecords, medForm, addMedical, loadMedical }
   },
   template: `
     <div class="container">
@@ -154,6 +183,20 @@ createApp({
               </select>
             </p>
             <p><small>Added: {{currentPet.createdAt}}</small></p>
+            <section style="margin-top:12px">
+              <h3>Medical records</h3>
+              <div v-if="medicalRecords.length===0">No records yet.</div>
+              <ul>
+                <li v-for="r in medicalRecords" :key="r.id"><strong>{{r.type}}</strong> — {{r.notes}} <small>({{r.vet}} {{r.date}})</small></li>
+              </ul>
+              <div style="margin-top:8px">
+                <h4>Add record</h4>
+                <div class="field"><label>Notes</label><textarea v-model="medForm.notes"></textarea></div>
+                <div class="field"><label>Vet</label><input v-model="medForm.vet" /></div>
+                <div class="field"><label>Date</label><input v-model="medForm.date" placeholder="YYYY-MM-DD" /></div>
+                <div class="actions"><button @click="addMedical(currentPet.id)">Add Record</button></div>
+              </div>
+            </section>
           </div>
           <div v-else>
             <p>Pet not found.</p>

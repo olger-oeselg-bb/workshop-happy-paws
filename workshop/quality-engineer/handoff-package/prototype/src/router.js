@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const { getPets, getPet, addPet, updatePet, resetDb } = require('./db')
+const { getPets, getPet, addPet, updatePet, getMedicalRecords, addMedicalRecord, resetDb } = require('./db')
 const logger = require('./logger')
 
 router.get('/pets', async (req, res) => {
@@ -63,4 +63,29 @@ router.patch('/pets/:id', async (req, res) => {
   }
 })
 
+// Medical records for a pet
+router.get('/pets/:id/medical-records', async (req, res) => {
+  try {
+    const recs = await getMedicalRecords(req.params.id)
+    res.json(recs)
+  } catch (err) {
+    logger.error({ err }, 'GET /pets/:id/medical-records error')
+    res.status(500).json({ error: 'internal' })
+  }
+})
+
+router.post('/pets/:id/medical-records', async (req, res) => {
+  try {
+    const { notes, vet, date, type } = req.body
+    if (!notes) return res.status(400).json({ error: 'notes required' })
+    const rec = await addMedicalRecord(req.params.id, { notes, vet: vet || '', date: date || new Date().toISOString(), type: type || 'note' })
+    if (!rec) return res.status(404).json({ error: 'pet_not_found' })
+    res.status(201).json(rec)
+  } catch (err) {
+    logger.error({ err }, 'POST /pets/:id/medical-records error')
+    res.status(500).json({ error: 'internal' })
+  }
+})
+
 module.exports = router
+
