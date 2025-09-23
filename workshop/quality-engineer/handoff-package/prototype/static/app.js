@@ -126,7 +126,8 @@ createApp({
               <img :src="p.photoUrl" :alt="p.name" />
               <div class="card-body">
                 <h3>{{p.name}}</h3>
-                <div class="meta">{{p.type}} • {{p.breed}} • {{p.status}}</div>
+                <div style="margin:6px 0"><span :class="'badge ' + (p.status==='In Shelter' ? 'in-shelter' : p.status==='Pending Adoption' ? 'pending' : p.status==='Adopted' ? 'adopted' : 'not-available')">{{p.status}}</span></div>
+                <div class="meta">{{p.type}} • {{p.breed}}</div>
               </div>
             </div>
           </div>
