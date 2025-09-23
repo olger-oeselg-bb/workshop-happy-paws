@@ -2,7 +2,8 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const path = require('path')
-const { initDb, getPets, addPet, resetDb } = require('./src/db')
+const { initDb } = require('./src/db')
+const logger = require('./src/logger')
 
 const app = express()
 app.use(cors())
@@ -13,9 +14,9 @@ async function start() {
   await initDb('db.json')
 
   const port = process.env.PORT || 3000
-  app.listen(port, () => console.log(`Prototype server running at http://localhost:${port}`))
+  app.listen(port, () => logger.info({ port }, `Prototype server running at http://localhost:${port}`))
 }
-start().catch(err => { console.error('Failed to start server', err); process.exit(1) })
+start().catch(err => { logger.error({ err }, 'Failed to start server'); process.exit(1) })
 
 app.use('/', express.static(path.join(__dirname, 'static')))
 const apiRouter = require('./src/router')
