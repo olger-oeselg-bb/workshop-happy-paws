@@ -1,1 +1,5 @@
+#Ignore installed modules
 node_modules
+
+# Ignore database file
+db.json
