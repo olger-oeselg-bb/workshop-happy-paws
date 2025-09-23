@@ -172,14 +172,14 @@ createApp({
           <div class="field"><label>Age</label><input v-model="form.age" /></div>
           <div class="field"><label>Gender</label><select v-model="form.gender"><option>Unknown</option><option>Male</option><option>Female</option></select></div>
           <div class="field"><label>Photo URL</label><input v-model="form.photoUrl" placeholder="https://..." /></div>
-          <div class="actions"><button @click="submit">Save</button> <button @click="goHome">Cancel</button></div>
+          <div class="actions"><button @click="submit">Save</button> <button class="btn-back" @click="goHome">Cancel</button></div>
           <div class="message" aria-live="polite">{{message}}</div>
         </section>
       </template>
 
       <template v-else>
         <section class="profile">
-          <button @click="goHome">← Back</button>
+          <button class="btn-back" @click="goHome">← Back</button>
           <div v-if="currentPet">
             <h2>{{currentPet.name}}</h2>
             <img :src="currentPet.photoUrl" :alt="currentPet.name" style="max-width:200px" />
@@ -187,9 +187,12 @@ createApp({
             <p><strong>Breed:</strong> {{currentPet.breed}}</p>
             <p><strong>Age:</strong> {{currentPet.age}}</p>
             <p><strong>Gender:</strong> {{currentPet.gender}}</p>
-            <p>
+            <p style="display:flex;align-items:center;gap:12px">
               <strong>Status:</strong>
-              <select :value="currentPet.status" @change="(e)=> updateStatus(currentPet.id, e.target.value)">
+              <!-- badge shows current status with same colors as list -->
+              <span :class="'badge ' + (currentPet.status==='In Shelter' ? 'in-shelter' : currentPet.status==='Pending Adoption' ? 'pending' : currentPet.status==='Adopted' ? 'adopted' : 'not-available')">{{currentPet.status}}</span>
+              <!-- nicer styled select; class matches badge variant for subtle visual cue -->
+              <select :value="currentPet.status" @change="(e)=> updateStatus(currentPet.id, e.target.value)" :class="'status-select ' + (currentPet.status==='In Shelter' ? 'in-shelter' : currentPet.status==='Pending Adoption' ? 'pending' : currentPet.status==='Adopted' ? 'adopted' : 'not-available')">
                 <option>In Shelter</option>
                 <option>Pending Adoption</option>
                 <option>Adopted</option>
