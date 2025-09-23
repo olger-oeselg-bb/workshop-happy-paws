@@ -1,13 +1,25 @@
 const express = require('express')
 const router = express.Router()
-const { getPets, addPet, resetDb } = require('./db')
+const { getPets, getPet, addPet, resetDb } = require('./db')
+const logger = require('./logger')
 
 router.get('/pets', async (req, res) => {
   try {
     const pets = await getPets()
     res.json(pets)
   } catch (err) {
-    console.error('GET /pets error', err)
+    logger.error({ err }, 'GET /pets error')
+    res.status(500).json({ error: 'internal' })
+  }
+})
+
+router.get('/pets/:id', async (req, res) => {
+  try {
+    const pet = await getPet(req.params.id)
+    if (!pet) return res.status(404).json({ error: 'not_found' })
+    res.json(pet)
+  } catch (err) {
+    logger.error({ err }, 'GET /pets/:id error')
     res.status(500).json({ error: 'internal' })
   }
 })

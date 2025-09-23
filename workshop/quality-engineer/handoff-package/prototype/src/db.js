@@ -17,6 +17,12 @@ async function getPets() {
   return db.data.pets
 }
 
+async function getPet(id) {
+  await db.read()
+  const pid = typeof id === 'string' ? parseInt(id, 10) : id
+  return db.data.pets.find(p => p.id === pid) || null
+}
+
 async function addPet(pet) {
   await db.read()
   const newPet = { id: db.data.idCounter++, ...pet, createdAt: new Date().toISOString() }
@@ -30,4 +36,4 @@ async function resetDb() {
   await db.write()
 }
 
-module.exports = { initDb, getPets, addPet, resetDb }
+module.exports = { initDb, getPets, getPet, addPet, resetDb }
