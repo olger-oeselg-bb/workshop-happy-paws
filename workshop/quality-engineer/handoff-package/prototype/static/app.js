@@ -3,13 +3,23 @@ const { createApp, ref, onMounted } = Vue
 createApp({
   setup() {
     const pets = ref([])
+  const filters = ref({ q: '', type: 'All', status: 'All', breed: '', minAge: '', maxAge: '' })
     const currentPet = ref(null)
     const view = ref('list') // 'list' or 'profile'
     const form = ref({ name: '', type: 'Dog', breed: '', age: '', gender: 'Unknown', status: 'In Shelter', photoUrl: '' })
     const message = ref('')
 
+    const buildQuery = () => {
+      const s = []
+      Object.entries(filters.value).forEach(([k, v]) => {
+        if (v !== null && v !== undefined && String(v).trim() !== '') s.push(`${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
+      })
+      return s.length ? `?${s.join('&')}` : ''
+    }
+
     const load = async () => {
-      const res = await fetch('/api/pets')
+      const q = buildQuery()
+      const res = await fetch('/api/pets' + q)
       pets.value = await res.json()
     }
 
@@ -128,6 +138,11 @@ createApp({
 
     const goToAdd = () => { location.hash = '#/add' }
 
+    const resetFilters = async () => {
+      filters.value = { q: '', type: 'All', status: 'All', breed: '', minAge: '', maxAge: '' }
+      await load()
+    }
+
     // handle back/forward
     window.addEventListener('popstate', () => navigateTo(location.hash))
     window.addEventListener('hashchange', () => navigateTo(location.hash))
@@ -136,8 +151,7 @@ createApp({
       await load()
       navigateTo(location.hash)
     })
-
-    return { pets, form, message, submit, view, currentPet, navigateTo, openPet, goHome, goToAdd, updateStatus, medicalRecords, medForm, addMedical, loadMedical }
+    return { pets, filters, resetFilters, load, form, message, submit, view, currentPet, navigateTo, openPet, goHome, goToAdd, updateStatus, medicalRecords, medForm, addMedical, loadMedical }
   },
   template: `
     <div class="container">
@@ -149,7 +163,30 @@ createApp({
             <h2>Pets</h2>
             <div class="actions"><button @click="goToAdd">Add Pet</button></div>
           </div>
-          <div v-if="pets.length===0">No pets yet.</div>
+
+          <!-- Filters -->
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0;align-items:center">
+            <input placeholder="Search by name" v-model="filters.q" @input="load" style="padding:8px;border:1px solid #ddd;border-radius:6px;min-width:180px" />
+            <select v-model="filters.type" @change="load" style="padding:8px;border:1px solid #ddd;border-radius:6px">
+              <option>All</option>
+              <option>Dog</option>
+              <option>Cat</option>
+              <option>Other</option>
+            </select>
+            <select v-model="filters.status" @change="load" style="padding:8px;border:1px solid #ddd;border-radius:6px">
+              <option>All</option>
+              <option>In Shelter</option>
+              <option>Pending Adoption</option>
+              <option>Adopted</option>
+              <option>Not Available</option>
+            </select>
+            <input placeholder="Breed (partial)" v-model="filters.breed" @input="load" style="padding:8px;border:1px solid #ddd;border-radius:6px;min-width:160px" />
+            <input placeholder="Min age" v-model="filters.minAge" @input="load" style="width:80px;padding:8px;border:1px solid #ddd;border-radius:6px" />
+            <input placeholder="Max age" v-model="filters.maxAge" @input="load" style="width:80px;padding:8px;border:1px solid #ddd;border-radius:6px" />
+            <button class="btn-back" @click="resetFilters">Reset</button>
+          </div>
+
+          <div v-if="pets.length===0">No pets found.</div>
           <div class="cards">
             <div class="card" v-for="p in pets" :key="p.id" @click="openPet(p)">
               <img :src="p.photoUrl" :alt="p.name" />

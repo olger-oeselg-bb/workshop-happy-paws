@@ -22,8 +22,8 @@ Legend
 - [x] US-004: As a veterinarian partner, I want to add medical records (notes, vet, date, type) to a pet's profile so medical history is tracked.
   - Implemented: `GET` and `POST` medical records endpoints and UI section on profile.
 
-- [ ] US-005: As a shelter worker, I want to search and filter pets by type, breed, age and status to quickly find candidates.
-  - Backlog: not implemented in the prototype UI.
+- [x] US-005: As a shelter worker, I want to search and filter pets by type, breed, age and status to quickly find candidates.
+  - Implemented: server-side query filtering (`GET /api/pets` supports q, type, status, breed, minAge, maxAge) and client-side filter controls in the list view.
 
 - [ ] US-006: As a QE, I want an API call to reset test data so I can run reproducible tests.
   - Implemented: `POST /api/reset` (marked as backlog only if you prefer a dedicated test-only endpoint; currently available).

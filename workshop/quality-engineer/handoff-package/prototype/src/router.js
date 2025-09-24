@@ -5,7 +5,41 @@ const logger = require('./logger')
 
 router.get('/pets', async (req, res) => {
   try {
-    const pets = await getPets()
+    // support query filters: type, breed (partial), status, minAge, maxAge, q (search by name)
+    const { type, breed, status, minAge, maxAge, q } = req.query
+    let pets = await getPets()
+
+    if (q) {
+      const term = String(q).toLowerCase()
+      pets = pets.filter(p => (p.name || '').toLowerCase().includes(term))
+    }
+
+    if (type && type !== 'All') {
+      pets = pets.filter(p => String(p.type || '') === String(type))
+    }
+
+    if (status && status !== 'All') {
+      pets = pets.filter(p => String(p.status || '') === String(status))
+    }
+
+    if (breed) {
+      const b = String(breed).toLowerCase()
+      pets = pets.filter(p => (p.breed || '').toLowerCase().includes(b))
+    }
+
+    // age filtering: treat age as numeric when possible
+    const min = minAge ? Number(minAge) : NaN
+    const max = maxAge ? Number(maxAge) : NaN
+    if (!Number.isNaN(min) || !Number.isNaN(max)) {
+      pets = pets.filter(p => {
+        const a = Number(p.age)
+        if (Number.isNaN(a)) return false
+        if (!Number.isNaN(min) && a < min) return false
+        if (!Number.isNaN(max) && a > max) return false
+        return true
+      })
+    }
+
     res.json(pets)
   } catch (err) {
     logger.error({ err }, 'GET /pets error')
