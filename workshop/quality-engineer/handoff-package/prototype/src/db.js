@@ -32,9 +32,15 @@ async function addPet(pet) {
   return newPet
 }
 
-async function resetDb() {
+const seeds = require('./seeds')
+
+async function resetDb(seedName) {
   // Reset pets and medical records with counters
-  db.data = { pets: [], medicalRecords: [], idCounter: 1, medicalIdCounter: 1 }
+  if (seedName && seeds[seedName]) {
+    db.data = JSON.parse(JSON.stringify(seeds[seedName]))
+  } else {
+    db.data = { pets: [], medicalRecords: [], idCounter: 1, medicalIdCounter: 1 }
+  }
   await db.write()
 }
 

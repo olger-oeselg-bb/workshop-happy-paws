@@ -54,6 +54,7 @@ All API paths are mounted under `/api`.
 - POST /api/reset
   - Request: none
   - Response: 200 OK — resets `db.json` to a small seeded dataset (used in tests and QE workflows)
+  - Seed support: POST /api/reset accepts an optional `seed` name in the query or JSON body (for example `?seed=default` or `{ "seed": "many" }`) to load predefined fixtures.
 
 
 ### Data shapes (simplified)

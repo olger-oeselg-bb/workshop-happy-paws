@@ -25,8 +25,8 @@ Legend
 - [x] US-005: As a shelter worker, I want to search and filter pets by type, breed, age and status to quickly find candidates.
   - Implemented: server-side query filtering (`GET /api/pets` supports q, type, status, breed, minAge, maxAge) and client-side filter controls in the list view.
 
-- [ ] US-006: As a QE, I want an API call to reset test data so I can run reproducible tests.
-  - Implemented: `POST /api/reset` (marked as backlog only if you prefer a dedicated test-only endpoint; currently available).
+ - [x] US-006: As a QE, I want an API call to reset test data so I can run reproducible tests.
+  - Implemented: `POST /api/reset` supports an optional `seed` name (query or JSON body). Available seeds: `default`, `minimal`, `many`.
 
 - [ ] US-007: As a volunteer coordinator, I want to upload and manage multiple photos per pet so I can showcase them to adopters.
   - Backlog: only single `photoUrl` is supported; file uploads not implemented.

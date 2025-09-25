@@ -74,8 +74,10 @@ router.post('/pets', async (req, res) => {
 
 router.post('/reset', async (req, res) => {
   try {
-    await resetDb()
-    res.json({ status: 'ok' })
+    // allow optional seed name in body or query: ?seed=default or { seed: 'many' }
+    const seed = (req.query && req.query.seed) || (req.body && req.body.seed)
+    await resetDb(seed)
+    res.json({ status: 'ok', seed: seed || 'none' })
   } catch (err) {
     logger.error({ err }, 'POST /reset error')
     res.status(500).json({ error: 'internal' })
