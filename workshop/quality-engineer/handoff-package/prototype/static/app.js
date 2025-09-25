@@ -6,8 +6,61 @@ createApp({
   const filters = ref({ q: '', type: 'All', status: 'All', breed: '', minAge: '', maxAge: '' })
     const currentPet = ref(null)
     const view = ref('list') // 'list' or 'profile'
-    const form = ref({ name: '', type: 'Dog', breed: '', age: '', gender: 'Unknown', status: 'In Shelter', photoUrl: '' })
-    const message = ref('')
+  const form = ref({ name: '', type: 'Dog', breed: '', age: '', gender: 'Unknown', status: 'In Shelter', photoUrl: '', photos: [] })
+    const addPhotosQueue = ref([]) // File objects selected in Add form
+  const addPhotoPreviews = ref([])
+
+    const onAddPhotosChange = (e) => {
+      const files = Array.from(e.target.files || [])
+      // revoke old previews
+      addPhotoPreviews.value.forEach(u => { try { URL.revokeObjectURL(u) } catch (e) {} })
+      addPhotosQueue.value = files
+      addPhotoPreviews.value = files.map(f => URL.createObjectURL(f))
+    }
+
+    const uploadPhotosForPet = async (files, petId) => {
+      if (!files || files.length === 0) return null
+      const fd = new FormData()
+      for (const f of files) fd.append('photos', f)
+      const res = await fetch(`/api/pets/${petId}/photos`, { method: 'POST', body: fd })
+      if (res.status === 201) return await res.json()
+      const err = await res.json()
+      throw new Error(err.error || 'upload_failed')
+    }
+  const message = ref('')
+  const toast = ref('')
+  const lightbox = ref({ open: false, src: null })
+  const profileFileInput = ref(null)
+
+    const onProfileFilesChange = async (e) => {
+      const files = Array.from(e.target.files || [])
+      if (!files.length) return
+      try {
+        await uploadPhotosForPet(files, currentPet.value.id)
+        await loadPet(currentPet.value.id)
+        toast.value = 'Photos uploaded'
+        setTimeout(() => { toast.value = '' }, 2500)
+      } catch (err) {
+        message.value = err.message || String(err)
+      } finally {
+        // reset file input so same file can be selected again if needed
+        if (profileFileInput.value) profileFileInput.value.value = ''
+      }
+    }
+
+    const triggerProfileUpload = () => {
+      if (profileFileInput.value) profileFileInput.value.click()
+    }
+
+    const openLightbox = (src) => {
+      lightbox.value.open = true
+      lightbox.value.src = src
+    }
+
+    const closeLightbox = () => {
+      lightbox.value.open = false
+      lightbox.value.src = null
+    }
 
     const buildQuery = () => {
       const s = []
@@ -30,6 +83,8 @@ createApp({
         view.value = 'profile'
         // load medical records for this pet
         await loadMedical(id)
+        // clear toast when loading profile
+        toast.value = ''
       } else {
         currentPet.value = null
         message.value = 'Pet not found.'
@@ -119,14 +174,26 @@ createApp({
 
     const submit = async () => {
       message.value = ''
-      if (!form.value.name || !form.value.type || !form.value.photoUrl) {
-        message.value = 'Name, type and photo URL are required.'
+      if (!form.value.name || !form.value.type) {
+        message.value = 'Name and type are required.'
         return
       }
       const res = await fetch('/api/pets', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form.value) })
       if (res.status === 201) {
         const pet = await res.json()
-        form.value = { name: '', type: 'Dog', breed: '', age: '', gender: 'Unknown', status: 'In Shelter', photoUrl: '' }
+        // if we have files queued, upload them
+          if (addPhotosQueue.value.length) {
+          try {
+            await uploadPhotosForPet(addPhotosQueue.value, pet.id)
+          } catch (err) {
+            console.error(err)
+          }
+        }
+        form.value = { name: '', type: 'Dog', breed: '', age: '', gender: 'Unknown', status: 'In Shelter', photoUrl: '' , photos: [] }
+        // revoke previews and clear queues
+        addPhotoPreviews.value.forEach(u => { try { URL.revokeObjectURL(u) } catch (e) {} })
+        addPhotoPreviews.value = []
+        addPhotosQueue.value = []
         await load()
         // navigate to profile of newly created pet via hash (triggers hashchange)
         location.hash = '#/pet/' + pet.id
@@ -134,6 +201,19 @@ createApp({
         const err = await res.json()
         message.value = err.error || 'Error'
       }
+    }
+
+    // return a gallery array that includes the primary photoUrl followed by photos[], de-duped
+    const galleryPhotos = () => {
+      if (!currentPet.value) return []
+      const list = []
+      if (currentPet.value.photoUrl) list.push(currentPet.value.photoUrl)
+      if (Array.isArray(currentPet.value.photos)) {
+        for (const p of currentPet.value.photos) {
+          if (p && !list.includes(p)) list.push(p)
+        }
+      }
+      return list
     }
 
     const goToAdd = () => { location.hash = '#/add' }
@@ -151,7 +231,7 @@ createApp({
       await load()
       navigateTo(location.hash)
     })
-    return { pets, filters, resetFilters, load, form, message, submit, view, currentPet, navigateTo, openPet, goHome, goToAdd, updateStatus, medicalRecords, medForm, addMedical, loadMedical }
+  return { pets, filters, resetFilters, load, form, message, toast, lightbox, submit, view, currentPet, navigateTo, openPet, goHome, goToAdd, updateStatus, medicalRecords, medForm, addMedical, loadMedical, addPhotosQueue, onAddPhotosChange, uploadPhotosForPet, profileFileInput, onProfileFilesChange, triggerProfileUpload, openLightbox, closeLightbox, galleryPhotos }
   },
   template: `
     <div class="container">
@@ -189,7 +269,7 @@ createApp({
           <div v-if="pets.length===0">No pets found.</div>
           <div class="cards">
             <div class="card" v-for="p in pets" :key="p.id" @click="openPet(p)">
-              <img :src="p.photoUrl" :alt="p.name" />
+              <img :src="(p.photoUrl || (p.photos && p.photos[0]) || '/placeholder.png')" :alt="p.name" />
               <div class="card-body">
                 <h3>{{p.name}}</h3>
                 <div style="margin:6px 0"><span :class="'badge ' + (p.status==='In Shelter' ? 'in-shelter' : p.status==='Pending Adoption' ? 'pending' : p.status==='Adopted' ? 'adopted' : 'not-available')">{{p.status}}</span></div>
@@ -208,7 +288,13 @@ createApp({
           <div class="field"><label>Breed</label><input v-model="form.breed" /></div>
           <div class="field"><label>Age</label><input v-model="form.age" /></div>
           <div class="field"><label>Gender</label><select v-model="form.gender"><option>Unknown</option><option>Male</option><option>Female</option></select></div>
-          <div class="field"><label>Photo URL</label><input v-model="form.photoUrl" placeholder="https://..." /></div>
+          <div class="field"><label>Photo URL (optional)</label><input v-model="form.photoUrl" placeholder="https://..." /></div>
+          <div class="field"><label>Upload photos (optional)</label><input type="file" multiple accept="image/*" @change="onAddPhotosChange" /></div>
+            <div style="display:flex;gap:8px;margin-bottom:8px">
+            <div v-for="(u, idx) in addPhotoPreviews" :key="idx" style="width:80px;height:80px;overflow:hidden;border-radius:6px;border:1px solid #eee;display:flex;align-items:center;justify-content:center;background:#fafafa">
+              <img :src="u" style="width:100%;height:100%;object-fit:cover" />
+            </div>
+          </div>
           <div class="actions"><button @click="submit">Save</button> <button class="btn-back" @click="goHome">Cancel</button></div>
           <div class="message" aria-live="polite">{{message}}</div>
         </section>
@@ -219,7 +305,22 @@ createApp({
           <button class="btn-back" @click="goHome">← Back</button>
           <div v-if="currentPet">
             <h2>{{currentPet.name}}</h2>
-            <img :src="currentPet.photoUrl" :alt="currentPet.name" style="max-width:200px" />
+            <div style="display:flex;gap:8px;align-items:flex-start">
+              <img :src="currentPet.photoUrl" :alt="currentPet.name" style="max-width:200px;border-radius:6px;cursor:pointer" @click="openLightbox(currentPet.photoUrl)" />
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <div style="display:flex;gap:8px;flex-wrap:wrap">
+                  <img v-for="(ph, idx) in galleryPhotos()" :key="ph" :src="ph" @click="openLightbox(ph)" style="width:80px;height:80px;object-fit:cover;border-radius:6px;border:1px solid #eee;cursor:pointer" />
+                </div>
+                <div>
+                  <label style="font-size:13px">Upload photos</label>
+                  <input ref="profileFileInput" type="file" multiple accept="image/*" style="display:none" @change="onProfileFilesChange" />
+                  <div style="display:flex;gap:8px;align-items:center">
+                    <button class="upload-btn" @click="triggerProfileUpload">Upload photos</button>
+                    <div style="font-size:12px;color:#666">(or drag & drop not supported in prototype)</div>
+                  </div>
+                </div>
+              </div>
+            </div>
             <p><strong>Type:</strong> {{currentPet.type}}</p>
             <p><strong>Breed:</strong> {{currentPet.breed}}</p>
             <p><strong>Age:</strong> {{currentPet.age}}</p>
@@ -257,6 +358,13 @@ createApp({
           </div>
         </section>
       </template>
+    </div>
+    <div v-if="toast" class="toast-success" role="status" aria-live="polite">{{toast}}</div>
+
+    <div v-if="lightbox.open" class="lb-backdrop" @click="closeLightbox">
+      <div class="lb-content" @click.stop>
+        <img :src="lightbox.src" style="max-width:90vw;max-height:80vh;object-fit:contain" />
+      </div>
     </div>
   `
 }).mount('#app')

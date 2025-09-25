@@ -1,6 +1,9 @@
 const express = require('express')
 const router = express.Router()
-const { getPets, getPet, addPet, updatePet, getMedicalRecords, addMedicalRecord, resetDb } = require('./db')
+const multer = require('multer')
+const path = require('path')
+const upload = multer({ dest: path.join(__dirname, '..', 'uploads') })
+const { getPets, getPet, addPet, updatePet, getMedicalRecords, addMedicalRecord, resetDb, addPhotoToPet } = require('./db')
 const logger = require('./logger')
 
 router.get('/pets', async (req, res) => {
@@ -123,5 +126,37 @@ router.post('/pets/:id/medical-records', async (req, res) => {
   }
 })
 
+// Photo upload for a pet (multipart/form-data)
+router.post('/pets/:id/photos', upload.array('photos', 6), async (req, res) => {
+  try {
+    if (!req.files || req.files.length === 0) return res.status(400).json({ error: 'no_files' })
+    const base = req.protocol + '://' + req.get('host')
+    const urls = []
+    for (const f of req.files) {
+      const url = base + '/uploads/' + path.basename(f.path)
+      const updated = await addPhotoToPet(req.params.id, url)
+      if (!updated) return res.status(404).json({ error: 'pet_not_found' })
+      urls.push(url)
+    }
+    res.status(201).json({ photos: urls })
+  } catch (err) {
+    logger.error({ err }, 'POST /pets/:id/photos error')
+    res.status(500).json({ error: 'internal' })
+  }
+})
+
+// List photos for a pet (returns pet.photos)
+router.get('/pets/:id/photos', async (req, res) => {
+  try {
+    const pet = await getPet(req.params.id)
+    if (!pet) return res.status(404).json({ error: 'not_found' })
+    res.json({ photos: pet.photos || [] })
+  } catch (err) {
+    logger.error({ err }, 'GET /pets/:id/photos error')
+    res.status(500).json({ error: 'internal' })
+  }
+})
+
 module.exports = router
+
 

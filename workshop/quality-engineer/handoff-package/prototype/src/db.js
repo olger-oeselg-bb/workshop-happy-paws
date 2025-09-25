@@ -26,7 +26,9 @@ async function getPet(id) {
 
 async function addPet(pet) {
   await db.read()
-  const newPet = { id: db.data.idCounter++, ...pet, createdAt: new Date().toISOString() }
+  // ensure photos array
+  const withPhotos = { ...pet, photos: pet.photos || [], photoUrl: pet.photoUrl || (pet.photos && pet.photos[0]) }
+  const newPet = { id: db.data.idCounter++, ...withPhotos, createdAt: new Date().toISOString() }
   db.data.pets.push(newPet)
   await db.write()
   return newPet
@@ -54,6 +56,19 @@ async function updatePet(id, changes) {
   return db.data.pets[idx]
 }
 
+async function addPhotoToPet(id, photoUrl) {
+  await db.read()
+  const pid = typeof id === 'string' ? parseInt(id, 10) : id
+  const pet = db.data.pets.find(p => p.id === pid)
+  if (!pet) return null
+  pet.photos = pet.photos || []
+  pet.photos.push(photoUrl)
+  // set primary photoUrl if not present
+  if (!pet.photoUrl) pet.photoUrl = photoUrl
+  await db.write()
+  return pet
+}
+
 async function getMedicalRecords(petId) {
   await db.read()
   const pid = typeof petId === 'string' ? parseInt(petId, 10) : petId
@@ -75,4 +90,4 @@ async function addMedicalRecord(petId, record) {
   return newRec
 }
 
-module.exports = { initDb, getPets, getPet, addPet, updatePet, getMedicalRecords, addMedicalRecord, resetDb }
+module.exports = { initDb, getPets, getPet, addPet, updatePet, getMedicalRecords, addMedicalRecord, resetDb, addPhotoToPet }

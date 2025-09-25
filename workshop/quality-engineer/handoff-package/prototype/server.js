@@ -8,6 +8,12 @@ const logger = require('./src/logger')
 const app = express()
 app.use(cors())
 app.use(bodyParser.json())
+const fs = require('fs')
+
+// ensure uploads directory exists and serve it
+const uploadsDir = path.join(__dirname, 'uploads')
+if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir)
+app.use('/uploads', express.static(uploadsDir))
 
 // initialize DB and start server
 async function start() {

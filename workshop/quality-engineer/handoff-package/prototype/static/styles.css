@@ -59,3 +59,51 @@ h1{margin:0 0 12px}
 }
 .btn-back:hover{background:#fafafa;border-color:#ccc}
 .btn-back:active{transform:translateY(1px)}
+
+/* Upload button (primary secondary variant) */
+.upload-btn{
+	display:inline-flex;
+	align-items:center;
+	gap:8px;
+	background:#28a745;
+	color:#fff;
+	padding:8px 12px;
+	border:none;
+	border-radius:6px;
+	cursor:pointer;
+}
+.upload-btn:hover{background:#23913e}
+
+/* success toast */
+.toast-success{
+	background:#e6ffed;
+	border:1px solid #27ae60;
+	color:#155724;
+	padding:8px 12px;
+	border-radius:6px;
+	margin-top:8px;
+}
+
+/* Lightbox / modal for viewing full image */
+.lb-backdrop{
+	position:fixed;
+	inset:0;
+	background:rgba(0,0,0,0.6);
+	display:flex;
+	align-items:center;
+	justify-content:center;
+	z-index:1000;
+}
+.lb-content{
+	background:transparent;
+	border-radius:8px;
+	max-width:90%;
+	max-height:90%;
+	overflow:hidden;
+}
+.lb-content img{
+	display:block;
+	max-width:100%;
+	max-height:100%;
+	border-radius:6px;
+}
