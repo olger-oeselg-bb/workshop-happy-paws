@@ -6,9 +6,9 @@ let db
 async function initDb(file = 'db.json') {
   const dbPath = path.join(__dirname, '..', file)
   // include medicalRecords and a separate counter
-  db = await JSONFilePreset(dbPath, { pets: [], medicalRecords: [], idCounter: 1, medicalIdCounter: 1 })
+  db = await JSONFilePreset(dbPath, { pets: [], medicalRecords: [], auditLogs: [], idCounter: 1, medicalIdCounter: 1, auditIdCounter: 1 })
   await db.read()
-  db.data = db.data || { pets: [], medicalRecords: [], idCounter: 1, medicalIdCounter: 1 }
+  db.data = db.data || { pets: [], medicalRecords: [], auditLogs: [], idCounter: 1, medicalIdCounter: 1, auditIdCounter: 1 }
   await db.write()
   return db
 }
@@ -41,7 +41,7 @@ async function resetDb(seedName) {
   if (seedName && seeds[seedName]) {
     db.data = JSON.parse(JSON.stringify(seeds[seedName]))
   } else {
-    db.data = { pets: [], medicalRecords: [], idCounter: 1, medicalIdCounter: 1 }
+    db.data = { pets: [], medicalRecords: [], auditLogs: [], idCounter: 1, medicalIdCounter: 1, auditIdCounter: 1 }
   }
   await db.write()
 }
@@ -69,6 +69,23 @@ async function addPhotoToPet(id, photoUrl) {
   return pet
 }
 
+async function addAuditLog(petId, entry) {
+  await db.read()
+  db.data.auditLogs = db.data.auditLogs || []
+  db.data.auditIdCounter = db.data.auditIdCounter || 1
+  const id = db.data.auditIdCounter++
+  const log = { id, petId: typeof petId === 'string' ? parseInt(petId, 10) : petId, ...entry, createdAt: new Date().toISOString() }
+  db.data.auditLogs.push(log)
+  await db.write()
+  return log
+}
+
+async function getAuditLogs(petId) {
+  await db.read()
+  const pid = typeof petId === 'string' ? parseInt(petId, 10) : petId
+  return (db.data.auditLogs || []).filter(a => a.petId === pid).sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt))
+}
+
 async function getMedicalRecords(petId) {
   await db.read()
   const pid = typeof petId === 'string' ? parseInt(petId, 10) : petId
@@ -90,4 +107,4 @@ async function addMedicalRecord(petId, record) {
   return newRec
 }
 
-module.exports = { initDb, getPets, getPet, addPet, updatePet, getMedicalRecords, addMedicalRecord, resetDb, addPhotoToPet }
+module.exports = { initDb, getPets, getPet, addPet, updatePet, getMedicalRecords, addMedicalRecord, resetDb, addPhotoToPet, addAuditLog, getAuditLogs }

@@ -28,10 +28,10 @@ Legend
  - [x] US-006: As a QE, I want an API call to reset test data so I can run reproducible tests.
   - Implemented: `POST /api/reset` supports an optional `seed` name (query or JSON body). Available seeds: `default`, `minimal`, `many`.
 
-- [ ] US-007: As a volunteer coordinator, I want to upload and manage multiple photos per pet so I can showcase them to adopters.
+- [x] US-007: As a volunteer coordinator, I want to upload and manage multiple photos per pet so I can showcase them to adopters.
   - Backlog: only single `photoUrl` is supported; file uploads not implemented.
 
-- [ ] US-008: As a shelter admin, I want audit logs for status changes and medical record edits so there's traceability.
+- [x] US-008: As a shelter admin, I want audit logs for status changes and medical record edits so there's traceability.
   - Backlog: not implemented.
 
 - [ ] US-009: As a volunteer, I want to view formatted timestamps and human-friendly dates in the UI so the data is easier to read.

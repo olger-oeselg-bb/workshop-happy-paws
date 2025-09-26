@@ -31,6 +31,7 @@ createApp({
   const toast = ref('')
   const lightbox = ref({ open: false, src: null })
   const profileFileInput = ref(null)
+  const auditLogs = ref([])
 
     const onProfileFilesChange = async (e) => {
       const files = Array.from(e.target.files || [])
@@ -83,6 +84,8 @@ createApp({
         view.value = 'profile'
         // load medical records for this pet
         await loadMedical(id)
+        // load audits
+        await loadAudit(id)
         // clear toast when loading profile
         toast.value = ''
       } else {
@@ -90,6 +93,18 @@ createApp({
         message.value = 'Pet not found.'
         view.value = 'list'
       }
+    }
+
+    const loadAudit = async (petId) => {
+      try {
+        const res = await fetch(`/api/pets/${petId}/audit`)
+        if (res.status === 200) {
+          const j = await res.json()
+          auditLogs.value = j.logs || []
+        } else {
+          auditLogs.value = []
+        }
+      } catch (e) { auditLogs.value = [] }
     }
 
       const medicalRecords = ref([])
@@ -231,7 +246,7 @@ createApp({
       await load()
       navigateTo(location.hash)
     })
-  return { pets, filters, resetFilters, load, form, message, toast, lightbox, submit, view, currentPet, navigateTo, openPet, goHome, goToAdd, updateStatus, medicalRecords, medForm, addMedical, loadMedical, addPhotosQueue, onAddPhotosChange, uploadPhotosForPet, profileFileInput, onProfileFilesChange, triggerProfileUpload, openLightbox, closeLightbox, galleryPhotos }
+  return { pets, filters, resetFilters, load, form, message, toast, lightbox, submit, view, currentPet, navigateTo, openPet, goHome, goToAdd, updateStatus, medicalRecords, medForm, addMedical, loadMedical, auditLogs, addPhotosQueue, onAddPhotosChange, uploadPhotosForPet, profileFileInput, onProfileFilesChange, triggerProfileUpload, openLightbox, closeLightbox, galleryPhotos }
   },
   template: `
     <div class="container">
@@ -351,6 +366,16 @@ createApp({
                 <div class="field"><label>Date</label><input v-model="medForm.date" placeholder="YYYY-MM-DD" /></div>
                 <div class="actions"><button @click="addMedical(currentPet.id)">Add Record</button></div>
               </div>
+            </section>
+            <section style="margin-top:12px">
+              <h3>Audit log</h3>
+              <div v-if="auditLogs.length===0">No audit entries.</div>
+              <ul>
+                <li v-for="a in auditLogs" :key="a.id">
+                  <small>{{a.createdAt}}</small>
+                  <div><strong>{{a.type}}</strong> — {{a.detail}}</div>
+                </li>
+              </ul>
             </section>
           </div>
           <div v-else>

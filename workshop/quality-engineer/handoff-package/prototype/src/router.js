@@ -3,7 +3,7 @@ const router = express.Router()
 const multer = require('multer')
 const path = require('path')
 const upload = multer({ dest: path.join(__dirname, '..', 'uploads') })
-const { getPets, getPet, addPet, updatePet, getMedicalRecords, addMedicalRecord, resetDb, addPhotoToPet } = require('./db')
+const { getPets, getPet, addPet, updatePet, getMedicalRecords, addMedicalRecord, resetDb, addPhotoToPet, addAuditLog, getAuditLogs } = require('./db')
 const logger = require('./logger')
 
 router.get('/pets', async (req, res) => {
@@ -95,7 +95,9 @@ router.patch('/pets/:id', async (req, res) => {
     if (!status || !allowed.includes(status)) return res.status(400).json({ error: 'invalid_status' })
     const updated = await updatePet(req.params.id, { status })
     if (!updated) return res.status(404).json({ error: 'not_found' })
-    res.json(updated)
+  // record audit
+  try { await addAuditLog(req.params.id, { type: 'status_change', detail: `Status changed to ${status}` }) } catch (e) { logger.warn({ e }, 'audit log failed') }
+  res.json(updated)
   } catch (err) {
     logger.error({ err }, 'PATCH /pets/:id error')
     res.status(500).json({ error: 'internal' })
@@ -119,6 +121,8 @@ router.post('/pets/:id/medical-records', async (req, res) => {
     if (!notes) return res.status(400).json({ error: 'notes required' })
     const rec = await addMedicalRecord(req.params.id, { notes, vet: vet || '', date: date || new Date().toISOString(), type: type || 'note' })
     if (!rec) return res.status(404).json({ error: 'pet_not_found' })
+  // record audit for medical record creation
+  try { await addAuditLog(req.params.id, { type: 'medical_record_add', detail: `${type || 'note'} added: ${String(notes).slice(0,120)}` }) } catch (e) { logger.warn({ e }, 'audit log failed') }
     res.status(201).json(rec)
   } catch (err) {
     logger.error({ err }, 'POST /pets/:id/medical-records error')
@@ -153,6 +157,17 @@ router.get('/pets/:id/photos', async (req, res) => {
     res.json({ photos: pet.photos || [] })
   } catch (err) {
     logger.error({ err }, 'GET /pets/:id/photos error')
+    res.status(500).json({ error: 'internal' })
+  }
+})
+
+// Audit logs for a pet
+router.get('/pets/:id/audit', async (req, res) => {
+  try {
+    const logs = await getAuditLogs(req.params.id)
+    res.json({ logs })
+  } catch (err) {
+    logger.error({ err }, 'GET /pets/:id/audit error')
     res.status(500).json({ error: 'internal' })
   }
 })
