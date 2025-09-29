@@ -25,7 +25,7 @@ Legend
 - [x] US-005: As a shelter worker, I want to search and filter pets by type, breed, age and status to quickly find candidates.
   - Implemented: server-side query filtering (`GET /api/pets` supports q, type, status, breed, minAge, maxAge) and client-side filter controls in the list view.
 
- - [x] US-006: As a QE, I want an API call to reset test data so I can run reproducible tests.
+- [x] US-006: As a QE, I want an API call to reset test data so I can run reproducible tests.
   - Implemented: `POST /api/reset` supports an optional `seed` name (query or JSON body). Available seeds: `default`, `minimal`, `many`.
 
 - [x] US-007: As a volunteer coordinator, I want to upload and manage multiple photos per pet so I can showcase them to adopters.
@@ -34,8 +34,8 @@ Legend
 - [x] US-008: As a shelter admin, I want audit logs for status changes and medical record edits so there's traceability.
   - Backlog: not implemented.
 
-- [ ] US-009: As a volunteer, I want to view formatted timestamps and human-friendly dates in the UI so the data is easier to read.
-  - Backlog: createdAt and record dates are shown raw; formatting improvement suggested.
+- [x] US-009: As a volunteer, I want to view formatted timestamps and human-friendly dates in the UI so the data is easier to read.
+  - Implemented: `formatDate` and `formatRelative` helpers added to `static/app.js`; profile, medical records and audit views now display human-friendly dates.
 
 ---
 

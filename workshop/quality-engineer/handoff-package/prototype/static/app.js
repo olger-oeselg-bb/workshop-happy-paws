@@ -63,6 +63,29 @@ createApp({
       lightbox.value.src = null
     }
 
+    // Human-friendly date formatting helpers (defined at setup scope)
+    const formatDate = (iso) => {
+      if (!iso) return ''
+      try {
+        const d = new Date(iso)
+        return new Intl.DateTimeFormat(undefined, { year: 'numeric', month: 'short', day: 'numeric' }).format(d)
+      } catch (e) { return iso }
+    }
+
+    const formatRelative = (iso) => {
+      if (!iso) return ''
+      try {
+        const d = new Date(iso)
+        const now = Date.now()
+        const diff = Math.floor((now - d.getTime()) / 1000)
+        if (diff < 60) return `${diff}s ago`
+        if (diff < 3600) return `${Math.floor(diff / 60)}m ago`
+        if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`
+        if (diff < 60 * 86400) return `${Math.floor(diff / 86400)}d ago`
+        return formatDate(iso)
+      } catch (e) { return iso }
+    }
+
     const buildQuery = () => {
       const s = []
       Object.entries(filters.value).forEach(([k, v]) => {
@@ -107,8 +130,8 @@ createApp({
       } catch (e) { auditLogs.value = [] }
     }
 
-      const medicalRecords = ref([])
-      const medForm = ref({ notes: '', vet: '', date: '', type: 'note' })
+  const medicalRecords = ref([])
+  const medForm = ref({ notes: '', vet: '', date: new Date().toISOString().slice(0,10), type: 'note' })
 
       const loadMedical = async (petId) => {
         const res = await fetch(`/api/pets/${petId}/medical-records`)
@@ -125,7 +148,7 @@ createApp({
         if (res.status === 201) {
           const rec = await res.json()
           medicalRecords.value.push(rec)
-          medForm.value = { notes: '', vet: '', date: '', type: 'note' }
+          medForm.value = { notes: '', vet: '', date: new Date().toISOString().slice(0,10), type: 'note' }
         } else {
           const err = await res.json()
           message.value = err.error || 'Error adding record'
@@ -246,7 +269,7 @@ createApp({
       await load()
       navigateTo(location.hash)
     })
-  return { pets, filters, resetFilters, load, form, message, toast, lightbox, submit, view, currentPet, navigateTo, openPet, goHome, goToAdd, updateStatus, medicalRecords, medForm, addMedical, loadMedical, auditLogs, addPhotosQueue, onAddPhotosChange, uploadPhotosForPet, profileFileInput, onProfileFilesChange, triggerProfileUpload, openLightbox, closeLightbox, galleryPhotos }
+  return { pets, filters, resetFilters, load, form, message, toast, lightbox, submit, view, currentPet, navigateTo, openPet, goHome, goToAdd, updateStatus, medicalRecords, medForm, addMedical, loadMedical, auditLogs, addPhotosQueue, onAddPhotosChange, uploadPhotosForPet, profileFileInput, onProfileFilesChange, triggerProfileUpload, openLightbox, closeLightbox, galleryPhotos, formatDate, formatRelative }
   },
   template: `
     <div class="container">
@@ -352,18 +375,18 @@ createApp({
                 <option>Not Available</option>
               </select>
             </p>
-            <p><small>Added: {{currentPet.createdAt}}</small></p>
+            <p><small>Added: {{formatDate(currentPet.createdAt)}}</small></p>
             <section style="margin-top:12px">
               <h3>Medical records</h3>
               <div v-if="medicalRecords.length===0">No records yet.</div>
               <ul>
-                <li v-for="r in medicalRecords" :key="r.id"><strong>{{r.type}}</strong> — {{r.notes}} <small>({{r.vet}} {{r.date}})</small></li>
+                <li v-for="r in medicalRecords" :key="r.id"><strong>{{r.type}}</strong> — {{r.notes}} <small>({{r.vet}} • {{formatDate(r.date)}})</small></li>
               </ul>
               <div style="margin-top:8px">
                 <h4>Add record</h4>
                 <div class="field"><label>Notes</label><textarea v-model="medForm.notes"></textarea></div>
                 <div class="field"><label>Vet</label><input v-model="medForm.vet" /></div>
-                <div class="field"><label>Date</label><input v-model="medForm.date" placeholder="YYYY-MM-DD" /></div>
+                <div class="field"><label>Date</label><input type="date" v-model="medForm.date" /></div>
                 <div class="actions"><button @click="addMedical(currentPet.id)">Add Record</button></div>
               </div>
             </section>
@@ -372,7 +395,7 @@ createApp({
               <div v-if="auditLogs.length===0">No audit entries.</div>
               <ul>
                 <li v-for="a in auditLogs" :key="a.id">
-                  <small>{{a.createdAt}}</small>
+                  <small :title="formatDate(a.createdAt)">{{formatRelative(a.createdAt)}}</small>
                   <div><strong>{{a.type}}</strong> — {{a.detail}}</div>
                 </li>
               </ul>
