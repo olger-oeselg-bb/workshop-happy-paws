@@ -135,3 +135,82 @@ Include:
 7. Logging and observability approach
 8. NFRs (performance, scalability, test coverage)
 9. Security & compliance constraints (GDPR, audit logs, authN/Z)
+```
+
+### 4.2. Generate Project Plan & Scope
+
+```text
+Using the architecture above and MVP handover data,
+create a structured **project plan**.
+
+Include:
+1. MVP scope summary
+2. Later / extended scope
+3. Domain glossary (10–20 business terms)
+4. Dependencies between major features
+```
+
+### 4.3. Generate Tickets
+
+```text
+You are a senior engineer planning backlog items from user stories.
+
+Create a list of **engineering tickets**, each sized 0.5–1 story point,
+that together cover the MVP. Include project scaffolding and technical setup tasks.
+
+Group tickets into phases:
+- Phase 1: Project setup
+- Phase 2: Core features
+- Phase 3: Integrations and testing
+- Phase 4: QA and deployment
+
+Each ticket should have:
+- Title
+- Description
+- Expected outcome
+- Related user story
+- Estimation (0.5 or 1 point)
+```
+
+### 4.4. Generate Contribution Guide
+
+```text
+Generate a `CONTRIBUTING.md` file for this project.
+
+Include:
+- Run and test instructions (backend + frontend)
+- Coding standards (TypeScript + Vue)
+- Git branching & commit rules
+- Linting, formatting, and testing requirements
+- Dependency management
+- Environment setup (Docker Compose)
+- Quality gates before merge
+```
+
+---
+
+## 5. Prompting best practices
+
+| Practice                                                | Why It Matters                                                 |
+| ------------------------------------------------------- | -------------------------------------------------------------- |
+| **Provide all handover materials in summarized form**   | The agent must “see the world” to make coherent designs.       |
+| **Be explicit about stack, framework, and constraints** | Prevents it from guessing wrong defaults.                      |
+| **Ask for structured output**                           | Easier to copy into docs and version control.                  |
+| **Iterate in stages**                                   | One clear goal per prompt = more accurate responses.           |
+| **Review and refine**                                   | Treat the agent as a collaborator, not an oracle.              |
+| **Use temperature / randomness wisely (if supported)**  | Lower values (0.2–0.4) produce more consistent technical docs. |
+| **Never share sensitive data**                          | Use placeholders for credentials, API keys, etc.               |
+| **Keep context window short and relevant**              | Summaries > entire text dumps.                                 |
+
+## 6. Optional additional contexts
+
+If applicable, also generate:
+
+- Test Strategy & QA context (unit, integration, E2E)
+- Deployment & CI/CD context
+- Monitoring setup
+- Versioning and branching policy
+- Localization or accessibility guidelines
+- Performance test baseline
+
+These can be added later once the main context is ready.
