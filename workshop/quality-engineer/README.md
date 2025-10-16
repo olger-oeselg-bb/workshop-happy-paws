@@ -40,6 +40,12 @@ As a **Quality Engineer**, your task is to **validate the solution**, ensure it 
 - Break the flow into **discrete test steps**.  
 - Document expected outcomes for each step.  
 
+### 4. Setting up context for coding agent
+
+You can also use single chat session to generate the context files one-by-one. I would prefer to use folder tests-agent-context/* to store the files regarding only agent and any other documentation can be put under /docs or in project root (README.md) 
+
+Check into [Agent Setup Guide E2E Acceptance Tests](./agent-setup-guide-e2e-acceptance-tests.md)
+
 ### 5. Implement Automated Tests
 - Based on the test plan, implement **end-to-end automated tests**.  
 - Use appropriate frameworks (e.g., Playwright, Cypress, Jest, or equivalent).  
