@@ -53,11 +53,41 @@ Check into [Agent Context Setup Guide](./agent-context-setup-guide.md)
 - Prepare minimal but functional UI screens (text based work as well, often better).
 - Example prompt for the coding agent to start work:
 ``` text
-Please summarize the previous work done and then as a senior software engineer continue implementing the <insert name here> project based on tickets in TICKETS.md. Keep in mind the overall implementation plan is in PLAN.md and architecture is in ARCHITECTURE.md, both contain vital info about the application you are building. Before each phase create a feature branch. After each phase show me the changes, I want to manually review and approve them. After each subtask/ticket is completed inside the phase you are working on then please commit changes and mark the ticket done in TICKETS.md. When the phase is complete then summarize it and stop working. The next phase to continue with is:
+Please summarize the previous work completed, and then — acting as a Senior Software Engineer continue implementing the <insert project name here> project.
+
+Your work should follow the tickets and project documentation as outlined below.
+
+Reference Documents:
+
+- TICKETS.md - Current tasks and subtasks to implement  
+- PLAN.md - Overall implementation plan and roadmap  
+- ARCHITECTURE.md - System architecture, technical decisions, and dependencies  
+
+These documents contain all vital information about the application you are building — including scope, data model, API design, and non-functional requirements.
+
+Workflow Instructions:
+
+1. Before each phase:
+   - Create a **new feature branch** named after the phase (e.g., `feature/<phase-name>`).
+
+2. During each phase:
+   - Implement the features and changes described in the corresponding tickets.
+   - Follow all coding standards, conventions, and practices defined in project documentation.
+   - Ensure tests pass and code adheres to architecture and design principles.
+
+3. After each subtask/ticket:
+   - Commit your changes with a clear and descriptive commit message.
+   - Mark the corresponding ticket as Done in TICKETS.md.
+
+4. After completing the entire phase:
+   - Present a summary of changes and show the updated files.
+   - Wait for manual review and approval before continuing to the next phase.
+
+---
+
+Next Phase to continue with is:
 
 [Insert phase here based on your TICKETS.md]
-
-Please follow all the guides and context provided to you.
 ```
 
 ### 6. Prepare for Hand-off to Quality Engineers
