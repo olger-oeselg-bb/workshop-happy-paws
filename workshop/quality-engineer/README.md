@@ -40,14 +40,45 @@ As a **Quality Engineer**, your task is to **validate the solution**, ensure it 
 - Break the flow into **discrete test steps**.  
 - Document expected outcomes for each step.  
 
-### 4. Implement Automated Tests
+### 5. Implement Automated Tests
 - Based on the test plan, implement **end-to-end automated tests**.  
 - Use appropriate frameworks (e.g., Playwright, Cypress, Jest, or equivalent).  
 - Commit tests incrementally:  
   - A single test or suite per commit.  
-  - Reference corresponding user story/ticket.  
+  - Reference corresponding user story/ticket.
+- Example prompt for the coding agent to start work:
+``` text
+Please summarize the previous work done and then as a senior Quality Engineer, continue implementing the <insert name here> project's automated end-to-end acceptance testing based on QA tickets in QA_TICKETS.md
 
-### 5. Provide Feedback to the Team
+Keep in mind that:
+- The overall testing plan is described in QA_PLAN.md.
+- The architecture and system context are in ARCHITECTURE.md.
+- The acceptance criteria are listed in QA_ACCEPTANCE_CRITERIA.md.
+
+All of these contain vital information about what you are testing, how the system behaves, and what quality signals are expected.
+
+Before starting each testing phase, create a new **feature branch dedicated to that phase.
+
+For each subtask/ticket inside the phase:
+- Implement the described test automation or validation (e.g., functional, E2E, regression, or observability checks).  
+- Follow all existing test data, fixtures, and environment setup instructions.  
+- Apply project-wide QA coding standards, structure, and conventions from QA_CONTRIBUTING.md.  
+- Once the subtask is completed, commit the changes and mark the corresponding ticket as Done in QA_TICKETS.md.
+
+After all subtasks in a phase are complete:
+1. Run the full suite locally and ensure results are green.  
+2. Generate and attach updated reports (coverage, screenshots, videos, metrics if applicable).  
+3. Summarize the phase results, including which user stories, acceptance criteria, or requirements are now fully tested.  
+4. Stop working and wait for manual review and approval before continuing.
+
+---
+
+Please continue with the following phase:
+
+[Insert next phase name here based on your QA_TICKETS.md]
+```
+
+### 6. Provide Feedback to the Team
 - Summarize test results: Which features passed, failed, or need refinement.  
 - Highlight **gaps or risks** in functionality.  
 - Suggest improvements (e.g., missing acceptance criteria, unclear flows).  

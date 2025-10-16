@@ -85,7 +85,7 @@ Workflow Instructions:
 
 ---
 
-Next Phase to continue with is:
+Please continue with the following phase:
 
 [Insert phase here based on your TICKETS.md]
 ```
