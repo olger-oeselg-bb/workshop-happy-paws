@@ -40,8 +40,8 @@ Legend
 - [x] US-010: As a veterinarian partner, I want to edit and delete medical records so I can correct or remove outdated information.
   - Implemented: edit/delete operations for medical records with UI confirmation dialogs; inline editing form and delete confirmation.
 
-- [ ] US-011: As a user with disabilities, I want accessible UI elements so I can navigate and use the application effectively.
-  - Backlog: add `aria-label` and `aria-live` messages for status updates and medical record creation; ensure forms have proper labels and keyboard navigation.
+- [x] US-011: As a user with disabilities, I want accessible UI elements so I can navigate and use the application effectively.
+  - Implemented: add `aria-label` and `aria-live` messages for status updates and medical record creation; ensure forms have proper labels and keyboard navigation.
 
 - [ ] US-012: As a QE, I want automated tests for key workflows so I can ensure quality and catch regressions.
   - Backlog: expand Playwright test coverage for status changes (verify badge color), medical record add/edit/delete, and reset endpoint consistency.
