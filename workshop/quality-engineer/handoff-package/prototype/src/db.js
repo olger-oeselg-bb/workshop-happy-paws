@@ -107,4 +107,24 @@ async function addMedicalRecord(petId, record) {
   return newRec
 }
 
-module.exports = { initDb, getPets, getPet, addPet, updatePet, getMedicalRecords, addMedicalRecord, resetDb, addPhotoToPet, addAuditLog, getAuditLogs }
+async function updateMedicalRecord(recordId, updates) {
+  await db.read()
+  const rid = typeof recordId === 'string' ? parseInt(recordId, 10) : recordId
+  const idx = db.data.medicalRecords.findIndex(r => r.id === rid)
+  if (idx === -1) return null
+  db.data.medicalRecords[idx] = { ...db.data.medicalRecords[idx], ...updates }
+  await db.write()
+  return db.data.medicalRecords[idx]
+}
+
+async function deleteMedicalRecord(recordId) {
+  await db.read()
+  const rid = typeof recordId === 'string' ? parseInt(recordId, 10) : recordId
+  const idx = db.data.medicalRecords.findIndex(r => r.id === rid)
+  if (idx === -1) return false
+  db.data.medicalRecords.splice(idx, 1)
+  await db.write()
+  return true
+}
+
+module.exports = { initDb, getPets, getPet, addPet, updatePet, getMedicalRecords, addMedicalRecord, resetDb, addPhotoToPet, addAuditLog, getAuditLogs, updateMedicalRecord, deleteMedicalRecord }

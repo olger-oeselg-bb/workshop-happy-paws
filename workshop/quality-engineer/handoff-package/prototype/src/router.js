@@ -3,7 +3,7 @@ const router = express.Router()
 const multer = require('multer')
 const path = require('path')
 const upload = multer({ dest: path.join(__dirname, '..', 'uploads') })
-const { getPets, getPet, addPet, updatePet, getMedicalRecords, addMedicalRecord, resetDb, addPhotoToPet, addAuditLog, getAuditLogs } = require('./db')
+const { getPets, getPet, addPet, updatePet, getMedicalRecords, addMedicalRecord, resetDb, addPhotoToPet, addAuditLog, getAuditLogs, updateMedicalRecord, deleteMedicalRecord } = require('./db')
 const logger = require('./logger')
 
 router.get('/pets', async (req, res) => {
@@ -126,6 +126,34 @@ router.post('/pets/:id/medical-records', async (req, res) => {
     res.status(201).json(rec)
   } catch (err) {
     logger.error({ err }, 'POST /pets/:id/medical-records error')
+    res.status(500).json({ error: 'internal' })
+  }
+})
+
+router.patch('/pets/:id/medical-records/:recordId', async (req, res) => {
+  try {
+    const { notes, vet, date, type } = req.body
+    if (!notes) return res.status(400).json({ error: 'notes required' })
+    const updated = await updateMedicalRecord(req.params.recordId, { notes, vet: vet || '', date: date || new Date().toISOString(), type: type || 'note' })
+    if (!updated) return res.status(404).json({ error: 'record_not_found' })
+    // record audit for medical record update
+    try { await addAuditLog(req.params.id, { type: 'medical_record_update', detail: `${type || 'note'} updated: ${String(notes).slice(0,120)}` }) } catch (e) { logger.warn({ e }, 'audit log failed') }
+    res.json(updated)
+  } catch (err) {
+    logger.error({ err }, 'PATCH /pets/:id/medical-records/:recordId error')
+    res.status(500).json({ error: 'internal' })
+  }
+})
+
+router.delete('/pets/:id/medical-records/:recordId', async (req, res) => {
+  try {
+    const deleted = await deleteMedicalRecord(req.params.recordId)
+    if (!deleted) return res.status(404).json({ error: 'record_not_found' })
+    // record audit for medical record deletion
+    try { await addAuditLog(req.params.id, { type: 'medical_record_delete', detail: `Record deleted` }) } catch (e) { logger.warn({ e }, 'audit log failed') }
+    res.status(204).send()
+  } catch (err) {
+    logger.error({ err }, 'DELETE /pets/:id/medical-records/:recordId error')
     res.status(500).json({ error: 'internal' })
   }
 })

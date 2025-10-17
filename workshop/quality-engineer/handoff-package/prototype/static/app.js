@@ -32,6 +32,7 @@ createApp({
   const lightbox = ref({ open: false, src: null })
   const profileFileInput = ref(null)
   const auditLogs = ref([])
+  const editingRecord = ref(null) // { id, notes, vet, date, type } when editing
 
     const onProfileFilesChange = async (e) => {
       const files = Array.from(e.target.files || [])
@@ -155,6 +156,39 @@ createApp({
         }
       }
 
+      const startEditMedical = (record) => {
+        editingRecord.value = { ...record }
+      }
+
+      const cancelEditMedical = () => {
+        editingRecord.value = null
+      }
+
+      const saveEditMedical = async (petId) => {
+        if (!editingRecord.value.notes) { message.value = 'Notes required'; return }
+        const res = await fetch(`/api/pets/${petId}/medical-records/${editingRecord.value.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(editingRecord.value) })
+        if (res.status === 200) {
+          const updated = await res.json()
+          const idx = medicalRecords.value.findIndex(r => r.id === updated.id)
+          if (idx !== -1) medicalRecords.value[idx] = updated
+          editingRecord.value = null
+        } else {
+          const err = await res.json()
+          message.value = err.error || 'Error updating record'
+        }
+      }
+
+      const deleteMedical = async (petId, recordId) => {
+        if (!confirm('Are you sure you want to delete this medical record?')) return
+        const res = await fetch(`/api/pets/${petId}/medical-records/${recordId}`, { method: 'DELETE' })
+        if (res.status === 204) {
+          medicalRecords.value = medicalRecords.value.filter(r => r.id !== recordId)
+        } else {
+          const err = await res.json()
+          message.value = err.error || 'Error deleting record'
+        }
+      }
+
       const updateStatus = async (id, newStatus) => {
         const res = await fetch(`/api/pets/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: newStatus }) })
         if (res.status === 200) {
@@ -269,7 +303,7 @@ createApp({
       await load()
       navigateTo(location.hash)
     })
-  return { pets, filters, resetFilters, load, form, message, toast, lightbox, submit, view, currentPet, navigateTo, openPet, goHome, goToAdd, updateStatus, medicalRecords, medForm, addMedical, loadMedical, auditLogs, addPhotosQueue, onAddPhotosChange, uploadPhotosForPet, profileFileInput, onProfileFilesChange, triggerProfileUpload, openLightbox, closeLightbox, galleryPhotos, formatDate, formatRelative }
+  return { pets, filters, resetFilters, load, form, message, toast, lightbox, submit, view, currentPet, navigateTo, openPet, goHome, goToAdd, updateStatus, medicalRecords, medForm, addMedical, loadMedical, auditLogs, editingRecord, startEditMedical, cancelEditMedical, saveEditMedical, deleteMedical, addPhotosQueue, onAddPhotosChange, uploadPhotosForPet, profileFileInput, onProfileFilesChange, triggerProfileUpload, openLightbox, closeLightbox, galleryPhotos, formatDate, formatRelative }
   },
   template: `
     <div class="container">
@@ -380,7 +414,19 @@ createApp({
               <h3>Medical records</h3>
               <div v-if="medicalRecords.length===0">No records yet.</div>
               <ul>
-                <li v-for="r in medicalRecords" :key="r.id"><strong>{{r.type}}</strong> — {{r.notes}} <small>({{r.vet}} • {{formatDate(r.date)}})</small></li>
+                <li v-for="r in medicalRecords" :key="r.id" style="margin-bottom:8px;padding:8px;border:1px solid #eee;border-radius:6px">
+                  <div v-if="editingRecord && editingRecord.id === r.id">
+                    <div class="field"><label>Notes</label><textarea v-model="editingRecord.notes"></textarea></div>
+                    <div class="field"><label>Vet</label><input v-model="editingRecord.vet" /></div>
+                    <div class="field"><label>Date</label><input type="date" v-model="editingRecord.date" /></div>
+                    <div class="field"><label>Type</label><select v-model="editingRecord.type"><option>note</option><option>vaccination</option><option>check-up</option><option>treatment</option></select></div>
+                    <div class="actions"><button @click="saveEditMedical(currentPet.id)">Save</button> <button class="btn-back" @click="cancelEditMedical">Cancel</button></div>
+                  </div>
+                  <div v-else>
+                    <strong>{{r.type}}</strong> — {{r.notes}} <small>({{r.vet}} • {{formatDate(r.date)}})</small>
+                    <div style="margin-top:4px"><button @click="startEditMedical(r)" style="font-size:12px;padding:4px 8px">Edit</button> <button @click="deleteMedical(currentPet.id, r.id)" style="font-size:12px;padding:4px 8px;background:#f44336;color:white;border:none;border-radius:4px">Delete</button></div>
+                  </div>
+                </li>
               </ul>
               <div style="margin-top:8px">
                 <h4>Add record</h4>
