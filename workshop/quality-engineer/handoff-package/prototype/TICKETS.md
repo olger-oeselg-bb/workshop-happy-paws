@@ -37,6 +37,15 @@ Legend
 - [x] US-009: As a volunteer, I want to view formatted timestamps and human-friendly dates in the UI so the data is easier to read.
   - Implemented: `formatDate` and `formatRelative` helpers added to `static/app.js`; profile, medical records and audit views now display human-friendly dates.
 
+- [ ] US-010: As a veterinarian partner, I want to edit and delete medical records so I can correct or remove outdated information.
+  - Backlog: edit/delete operations for medical records not implemented; UI confirmation dialogs needed.
+
+- [ ] US-011: As a user with disabilities, I want accessible UI elements so I can navigate and use the application effectively.
+  - Backlog: add `aria-label` and `aria-live` messages for status updates and medical record creation; ensure forms have proper labels and keyboard navigation.
+
+- [ ] US-012: As a QE, I want automated tests for key workflows so I can ensure quality and catch regressions.
+  - Backlog: expand Playwright test coverage for status changes (verify badge color), medical record add/edit/delete, and reset endpoint consistency.
+
 ---
 
 ## Improvements & Tech debt (observations during development)
@@ -45,17 +54,17 @@ Legend
   - Done (profile select styled) — but consider adding a small transition when badge changes, and make the select keyboard-friendly with clearer focus outline (aria attributes). Priority: low.
 
 - Accessibility
-  - Add `aria-label` and `aria-live` messages for status updates and medical record creation. Ensure forms have proper labels and keyboard navigation. Priority: medium.
+  - See US-011 for accessibility improvements.
 
 - Medical records
-  - Add edit/delete operations for medical records and UX feedback on success/failure.
+  - See US-010 for edit/delete operations.
   - Add validation to ensure `date` uses a consistent format and consider storing ISO timestamps.
 
 - Photo handling
   - Support multiple photos and image upload (multipart) with server-side storage or integration with S3/local uploads for realistic testing.
 
 - Tests
-  - Expand Playwright test coverage: add tests for status changes (verify badge color), medical record add/edit/delete, and reset endpoint consistency.
+  - See US-012 for expanding Playwright test coverage.
 
 - Data model
   - Consider switching from file-based lowdb to an in-memory DB for CI tests or to SQLite/Postgres for more realistic concurrency testing.
@@ -76,12 +85,9 @@ Legend
 
 ## Suggested next tickets (for sprint planning)
 
-- TICKET-101: Add search and filtering to the pet list (status, type, breed). (est: 2-3d)
-- TICKET-102: Add edit/delete for medical records and UI confirmation dialogs. (est: 1-2d)
-- TICKET-103: Add multiple photos and file upload support (backend + UI). (est: 3-5d)
-- TICKET-104: Add accessibility improvements and aria attributes for status updates. (est: 1d)
-- TICKET-105: Add Playwright tests for status badge color and medical record workflows. (est: 1-2d)
-- TICKET-106: Add `seed` parameter to `POST /api/reset` to load different datasets for testing. (est: 1d)
+- TICKET-102: Add edit/delete for medical records and UI confirmation dialogs. (est: 1-2d) — Now US-010
+- TICKET-104: Add accessibility improvements and aria attributes for status updates. (est: 1d) — Now US-011
+- TICKET-105: Add Playwright tests for status badge color and medical record workflows. (est: 1-2d) — Now US-012
 
 
 ---
