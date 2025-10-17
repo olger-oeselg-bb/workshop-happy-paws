@@ -313,29 +313,29 @@ createApp({
         <section class="list">
           <div style="display:flex;justify-content:space-between;align-items:center">
             <h2>Pets</h2>
-            <div class="actions"><button @click="goToAdd">Add Pet</button></div>
+            <div class="actions"><button @click="goToAdd" aria-label="Add a new pet">Add Pet</button></div>
           </div>
 
           <!-- Filters -->
           <div style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0;align-items:center">
-            <input placeholder="Search by name" v-model="filters.q" @input="load" style="padding:8px;border:1px solid #ddd;border-radius:6px;min-width:180px" />
-            <select v-model="filters.type" @change="load" style="padding:8px;border:1px solid #ddd;border-radius:6px">
+            <input placeholder="Search by name" v-model="filters.q" @input="load" style="padding:8px;border:1px solid #ddd;border-radius:6px;min-width:180px" aria-label="Search pets by name" />
+            <select v-model="filters.type" @change="load" style="padding:8px;border:1px solid #ddd;border-radius:6px" aria-label="Filter by pet type">
               <option>All</option>
               <option>Dog</option>
               <option>Cat</option>
               <option>Other</option>
             </select>
-            <select v-model="filters.status" @change="load" style="padding:8px;border:1px solid #ddd;border-radius:6px">
+            <select v-model="filters.status" @change="load" style="padding:8px;border:1px solid #ddd;border-radius:6px" aria-label="Filter by pet status">
               <option>All</option>
               <option>In Shelter</option>
               <option>Pending Adoption</option>
               <option>Adopted</option>
               <option>Not Available</option>
             </select>
-            <input placeholder="Breed (partial)" v-model="filters.breed" @input="load" style="padding:8px;border:1px solid #ddd;border-radius:6px;min-width:160px" />
-            <input placeholder="Min age" v-model="filters.minAge" @input="load" style="width:80px;padding:8px;border:1px solid #ddd;border-radius:6px" />
-            <input placeholder="Max age" v-model="filters.maxAge" @input="load" style="width:80px;padding:8px;border:1px solid #ddd;border-radius:6px" />
-            <button class="btn-back" @click="resetFilters">Reset</button>
+            <input placeholder="Breed (partial)" v-model="filters.breed" @input="load" style="padding:8px;border:1px solid #ddd;border-radius:6px;min-width:160px" aria-label="Filter by breed" />
+            <input placeholder="Min age" v-model="filters.minAge" @input="load" style="width:80px;padding:8px;border:1px solid #ddd;border-radius:6px" aria-label="Minimum age filter" />
+            <input placeholder="Max age" v-model="filters.maxAge" @input="load" style="width:80px;padding:8px;border:1px solid #ddd;border-radius:6px" aria-label="Maximum age filter" />
+            <button class="btn-back" @click="resetFilters" aria-label="Reset all filters">Reset</button>
           </div>
 
           <div v-if="pets.length===0">No pets found.</div>
@@ -367,14 +367,14 @@ createApp({
               <img :src="u" style="width:100%;height:100%;object-fit:cover" />
             </div>
           </div>
-          <div class="actions"><button @click="submit">Save</button> <button class="btn-back" @click="goHome">Cancel</button></div>
+          <div class="actions"><button @click="submit" aria-label="Save the new pet">Save</button> <button class="btn-back" @click="goHome" aria-label="Cancel and return to pet list">Cancel</button></div>
           <div class="message" aria-live="polite">{{message}}</div>
         </section>
       </template>
 
       <template v-else>
         <section class="profile">
-          <button class="btn-back" @click="goHome">← Back</button>
+          <button class="btn-back" @click="goHome" aria-label="Return to pet list">← Back</button>
           <div v-if="currentPet">
             <h2>{{currentPet.name}}</h2>
             <div style="display:flex;gap:8px;align-items:flex-start">
@@ -387,7 +387,7 @@ createApp({
                   <label style="font-size:13px">Upload photos</label>
                   <input ref="profileFileInput" type="file" multiple accept="image/*" style="display:none" @change="onProfileFilesChange" />
                   <div style="display:flex;gap:8px;align-items:center">
-                    <button class="upload-btn" @click="triggerProfileUpload">Upload photos</button>
+                    <button class="upload-btn" @click="triggerProfileUpload" aria-label="Upload additional photos for this pet">Upload photos</button>
                     <div style="font-size:12px;color:#666">(or drag & drop not supported in prototype)</div>
                   </div>
                 </div>
@@ -397,12 +397,12 @@ createApp({
             <p><strong>Breed:</strong> {{currentPet.breed}}</p>
             <p><strong>Age:</strong> {{currentPet.age}}</p>
             <p><strong>Gender:</strong> {{currentPet.gender}}</p>
-            <p style="display:flex;align-items:center;gap:12px">
+            <p style="display:flex;align-items:center;gap:12px" aria-live="polite">
               <strong>Status:</strong>
               <!-- badge shows current status with same colors as list -->
               <span :class="'badge ' + (currentPet.status==='In Shelter' ? 'in-shelter' : currentPet.status==='Pending Adoption' ? 'pending' : currentPet.status==='Adopted' ? 'adopted' : 'not-available')">{{currentPet.status}}</span>
               <!-- nicer styled select; class matches badge variant for subtle visual cue -->
-              <select :value="currentPet.status" @change="(e)=> updateStatus(currentPet.id, e.target.value)" :class="'status-select ' + (currentPet.status==='In Shelter' ? 'in-shelter' : currentPet.status==='Pending Adoption' ? 'pending' : currentPet.status==='Adopted' ? 'adopted' : 'not-available')">
+              <select :value="currentPet.status" @change="(e)=> updateStatus(currentPet.id, e.target.value)" :class="'status-select ' + (currentPet.status==='In Shelter' ? 'in-shelter' : currentPet.status==='Pending Adoption' ? 'pending' : currentPet.status==='Adopted' ? 'adopted' : 'not-available')" aria-label="Change pet status">
                 <option>In Shelter</option>
                 <option>Pending Adoption</option>
                 <option>Adopted</option>
@@ -410,7 +410,7 @@ createApp({
               </select>
             </p>
             <p><small>Added: {{formatDate(currentPet.createdAt)}}</small></p>
-            <section style="margin-top:12px">
+            <section style="margin-top:12px" aria-live="polite">
               <h3>Medical records</h3>
               <div v-if="medicalRecords.length===0">No records yet.</div>
               <ul>
@@ -420,11 +420,11 @@ createApp({
                     <div class="field"><label>Vet</label><input v-model="editingRecord.vet" /></div>
                     <div class="field"><label>Date</label><input type="date" v-model="editingRecord.date" /></div>
                     <div class="field"><label>Type</label><select v-model="editingRecord.type"><option>note</option><option>vaccination</option><option>check-up</option><option>treatment</option></select></div>
-                    <div class="actions"><button @click="saveEditMedical(currentPet.id)">Save</button> <button class="btn-back" @click="cancelEditMedical">Cancel</button></div>
+                    <div class="actions"><button @click="saveEditMedical(currentPet.id)" aria-label="Save changes to medical record">Save</button> <button class="btn-back" @click="cancelEditMedical" aria-label="Cancel editing medical record">Cancel</button></div>
                   </div>
                   <div v-else>
                     <strong>{{r.type}}</strong> — {{r.notes}} <small>({{r.vet}} • {{formatDate(r.date)}})</small>
-                    <div style="margin-top:4px"><button @click="startEditMedical(r)" style="font-size:12px;padding:4px 8px">Edit</button> <button @click="deleteMedical(currentPet.id, r.id)" style="font-size:12px;padding:4px 8px;background:#f44336;color:white;border:none;border-radius:4px">Delete</button></div>
+                    <div style="margin-top:4px"><button @click="startEditMedical(r)" style="font-size:12px;padding:4px 8px" aria-label="Edit this medical record">Edit</button> <button @click="deleteMedical(currentPet.id, r.id)" style="font-size:12px;padding:4px 8px;background:#f44336;color:white;border:none;border-radius:4px" aria-label="Delete this medical record">Delete</button></div>
                   </div>
                 </li>
               </ul>
@@ -433,7 +433,7 @@ createApp({
                 <div class="field"><label>Notes</label><textarea v-model="medForm.notes"></textarea></div>
                 <div class="field"><label>Vet</label><input v-model="medForm.vet" /></div>
                 <div class="field"><label>Date</label><input type="date" v-model="medForm.date" /></div>
-                <div class="actions"><button @click="addMedical(currentPet.id)">Add Record</button></div>
+                <div class="actions"><button @click="addMedical(currentPet.id)" aria-label="Add a new medical record">Add Record</button></div>
               </div>
             </section>
             <section style="margin-top:12px">
