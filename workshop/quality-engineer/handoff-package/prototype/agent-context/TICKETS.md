@@ -51,7 +51,7 @@ Legend
   - Goal: Document phases, risks, dependencies, and rollback strategy for the migration in `FRONTEND_REFACTOR_PLAN.md`.
   - Acceptance criteria: Plan file outlines phased timeline, risk log, rollback steps, and stakeholder sign-off checklist.
 
-- [ ] FE-TECH-002: Introduce Vite build environment
+- [x] FE-TECH-002: Introduce Vite build environment
   - Goal: Set up a `frontend/` workspace using Vite with dev/build scripts wired into `package.json`.
   - Acceptance criteria: `npm run dev:frontend` serves the app with hot module replacement; Express can serve the production build output.
 
