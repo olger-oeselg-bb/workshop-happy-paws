@@ -14,6 +14,7 @@ This document outlines the phased migration of the Happy Paws prototype frontend
 - No regressions in accessibility or performance.
 - New codebase achieves 80%+ unit test coverage for components.
 - Build and deploy process updated to use Vite.
+- E2E test coverage is left to QE team to implement as part of their practice exercises.
 
 ---
 
@@ -44,7 +45,7 @@ This document outlines the phased migration of the Happy Paws prototype frontend
   - `<PetProfile>` with medical records and audit log modules.
   - API service layer (`src/api/`) for centralized HTTP calls.
   - UI feedback store for toasts and modals.
-- **Milestones:** Profile view, medical CRUD, and photo gallery implemented; E2E tests updated if needed.
+- **Milestones:** Profile view, medical CRUD, and photo gallery implemented.
 
 ### Phase 4: Testing, Docs, & Cutover (FE-TECH-014 to FE-TECH-017, FE-TEST-001, FE-DOC-001/002)
 - **Duration:** 1-2 weeks
@@ -62,8 +63,8 @@ This document outlines the phased migration of the Happy Paws prototype frontend
 - **Team:** 1-2 frontend developers familiar with Vue 3, Pinia, and Vite.
 - **Tools:** Node.js 18+, npm workspaces for monorepo setup.
 - **Backend:** Existing Express API must remain stable; no changes to `/api/*` endpoints.
-- **Testing:** Playwright E2E tests will validate end-to-end; new unit tests added incrementally.
-- **Stakeholders:** QE team for test alignment; BA for UX sign-off.
+- **Testing:** Unit tests for components added incrementally; E2E testing delegated to QE team.
+- **Stakeholders:** QE team for coordination; BA for UX sign-off.
 
 ---
 
@@ -113,8 +114,8 @@ This document outlines the phased migration of the Happy Paws prototype frontend
 ---
 
 ## Success Metrics
-- **Functional:** All US-001 to US-011 pass E2E tests.
-- **Quality:** 0 critical accessibility issues; 80% unit coverage.
+- **Functional:** All US-001 to US-011 remain functional (manual verification or existing E2E tests maintained by QE).
+- **Quality:** 0 critical accessibility issues; 80% unit coverage for components.
 - **Performance:** No >10% increase in bundle size or load times.
 - **Adoption:** Team comfortable maintaining Vue codebase.
 

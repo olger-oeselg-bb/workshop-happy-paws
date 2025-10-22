@@ -93,7 +93,7 @@ Legend
 
 - [ ] FE-TECH-012: Introduce API service layer
   - Goal: Centralize network calls for pets, medical records, and audit logs.
-  - Acceptance criteria: Modules under `src/api/` encapsulate fetch logic with shared error handling and are covered by lightweight unit tests or mocks.
+  - Acceptance criteria: Modules under `src/api/` encapsulate fetch logic with shared error handling.
 
 - [ ] FE-TECH-013: Wire Pinia actions to API layer
   - Goal: Ensure stores delegate HTTP concerns to the new service modules.
