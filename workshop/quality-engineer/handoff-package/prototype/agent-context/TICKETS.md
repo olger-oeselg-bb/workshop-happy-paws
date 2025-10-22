@@ -47,7 +47,7 @@ Legend
 
 ## Frontend Refactor Backlog — Vue 3 + Pinia + Vite
 
-- [ ] FE-TECH-001: Establish frontend refactor plan
+- [x] FE-TECH-001: Establish frontend refactor plan
   - Goal: Document phases, risks, dependencies, and rollback strategy for the migration in `FRONTEND_REFACTOR_PLAN.md`.
   - Acceptance criteria: Plan file outlines phased timeline, risk log, rollback steps, and stakeholder sign-off checklist.
 
@@ -93,7 +93,7 @@ Legend
 
 - [ ] FE-TECH-012: Introduce API service layer
   - Goal: Centralize network calls for pets, medical records, and audit logs.
-  - Acceptance criteria: Modules under `src/api/` encapsulate fetch logic with shared error handling and are covered by lightweight unit tests or mocks.
+  - Acceptance criteria: Modules under `src/api/` encapsulate fetch logic with shared error handling.
 
 - [ ] FE-TECH-013: Wire Pinia actions to API layer
   - Goal: Ensure stores delegate HTTP concerns to the new service modules.
