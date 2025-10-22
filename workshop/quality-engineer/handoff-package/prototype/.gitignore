@@ -6,3 +6,5 @@ db.json
 
 # Ignore uploaded images
 uploads
+# Ignore Vite build output
+dist
