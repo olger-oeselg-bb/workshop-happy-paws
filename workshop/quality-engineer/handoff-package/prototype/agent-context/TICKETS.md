@@ -47,7 +47,7 @@ Legend
 
 ## Frontend Refactor Backlog — Vue 3 + Pinia + Vite
 
-- [ ] FE-TECH-001: Establish frontend refactor plan
+- [x] FE-TECH-001: Establish frontend refactor plan
   - Goal: Document phases, risks, dependencies, and rollback strategy for the migration in `FRONTEND_REFACTOR_PLAN.md`.
   - Acceptance criteria: Plan file outlines phased timeline, risk log, rollback steps, and stakeholder sign-off checklist.
 
