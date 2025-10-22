@@ -43,8 +43,90 @@ Legend
 - [x] US-011: As a user with disabilities, I want accessible UI elements so I can navigate and use the application effectively.
   - Implemented: add `aria-label` and `aria-live` messages for status updates and medical record creation; ensure forms have proper labels and keyboard navigation.
 
-- [ ] US-012: As a QE, I want automated tests for key workflows so I can ensure quality and catch regressions.
-  - Backlog: expand Playwright test coverage for status changes (verify badge color), medical record add/edit/delete, and reset endpoint consistency.
+- [ ] US-012: As an engineer I want to redesign front-end to use Vue 3 framework as current front-end code is already growing large. 
+
+---
+## Frontend Refactor Backlog — Vue 3 + Pinia + Vite
+
+- [ ] FE-TECH-001: Establish frontend refactor plan
+  - Goal: Document phases, risks, dependencies, and rollback strategy for the migration in `FRONTEND_REFACTOR_PLAN.md`.
+  - Acceptance criteria: Plan file outlines phased timeline, risk log, rollback steps, and stakeholder sign-off checklist.
+
+- [ ] FE-TECH-002: Introduce Vite build environment
+  - Goal: Set up a `frontend/` workspace using Vite with dev/build scripts wired into `package.json`.
+  - Acceptance criteria: `npm run dev:frontend` serves the app with hot module replacement; Express can serve the production build output.
+
+- [ ] FE-TECH-003: Scaffold Pinia stores
+  - Goal: Create a central store for pets, filters, active pet details, and UI messages.
+  - Acceptance criteria: Store exposes actions for loading pets/profile data and managing medical records while maintaining current functionality.
+
+- [ ] FE-TECH-004: Adopt vue-router for navigation
+  - Goal: Replace manual hash handling with declarative routes (`/`, `/add`, `/pet/:id`).
+  - Acceptance criteria: Router configuration created, navigation guards preserve existing behavior, and deep links load correct views.
+
+- [ ] FE-TECH-005: Implement AppShell layout
+  - Goal: Provide a top-level layout component housing header, toast region, and router view.
+  - Acceptance criteria: `<AppShell>` renders shared chrome with accessible landmarks and consumes Pinia UI state.
+
+- [ ] FE-TECH-006: Extract PetList and Filters components
+  - Goal: Break the list view into reusable components backed by store state.
+  - Acceptance criteria: `<PetList>` and `<PetFilters>` render pet cards, handle filter changes, and preserve existing accessibility enhancements.
+
+- [ ] FE-TECH-007: Create PetCard component
+  - Goal: Encapsulate card markup, status badge, and click handling.
+  - Acceptance criteria: Component accepts a pet prop, emits select events, and supports keyboard activation with descriptive alt text.
+
+- [ ] FE-TECH-008: Isolate AddPetForm component
+  - Goal: Move intake form logic into a dedicated component with validation helpers.
+  - Acceptance criteria: Component emits `submit` with payload, manages photo uploads, and keeps aria attributes from the legacy form.
+
+- [ ] FE-TECH-009: Build PetProfile route module
+  - Goal: Compose profile view from child components (status, gallery, medical records, audit log).
+  - Acceptance criteria: Route loads data via Pinia actions, handles loading/error states, and reuses shared UI components.
+
+- [ ] FE-TECH-010: Implement MedicalRecords module
+  - Goal: Create dedicated components/composables for listing and editing medical records.
+  - Acceptance criteria: CRUD actions are driven through the store, inline edit form remains accessible, and aria-live announcements persist.
+
+- [ ] FE-TECH-011: Implement PhotoGallery and uploader components
+  - Goal: Provide reusable gallery/lightbox and upload triggers for pet media.
+  - Acceptance criteria: Components support keyboard navigation, expose events for uploads, and display both primary and additional photos.
+
+- [ ] FE-TECH-012: Introduce API service layer
+  - Goal: Centralize network calls for pets, medical records, and audit logs.
+  - Acceptance criteria: Modules under `src/api/` encapsulate fetch logic with shared error handling and are covered by lightweight unit tests or mocks.
+
+- [ ] FE-TECH-013: Wire Pinia actions to API layer
+  - Goal: Ensure stores delegate HTTP concerns to the new service modules.
+  - Acceptance criteria: Stores manage loading/error flags, update state predictably, and expose success/failure events for the UI store.
+
+- [ ] FE-TECH-014: Add UI feedback store
+  - Goal: Provide a Pinia store for toast/alert messaging and modal coordination.
+  - Acceptance criteria: `<ToastRegion>` consumes the store, supports multiple variants, and replaces legacy `message`/`toast` refs.
+
+- [ ] FE-TECH-015: Post-migration accessibility audit
+  - Goal: Validate that the new component architecture maintains or improves accessibility.
+  - Acceptance criteria: Documented axe-core (or similar) audit with issues resolved or logged in backlog, including keyboard navigation verification.
+
+- [ ] FE-TECH-016: Retire legacy `static/app.js`
+  - Goal: Remove monolithic script once Vite-based app reaches parity.
+  - Acceptance criteria: Build artifacts served by Express, legacy file deleted, and rollback instructions noted in docs.
+
+- [ ] FE-TECH-017: Create TypeScript adoption ADR (optional)
+  - Goal: Decide whether to adopt TypeScript during refactor.
+  - Acceptance criteria: ADR file summarizes decision, trade-offs, and onboarding steps; codebase aligns with chosen direction.
+
+- [ ] FE-TEST-001: Add component unit test coverage
+  - Goal: Introduce Vitest + Vue Test Utils for critical components (e.g., PetList, MedicalRecords, StatusSelect).
+  - Acceptance criteria: Test suite runs via `npm run test:unit`, covers happy paths and edge cases, and integrates with CI.
+
+- [ ] FE-DOC-001: Update architecture documentation
+  - Goal: Reflect new tooling, component structure, and state management approach in `ARCHITECTURE.md`.
+  - Acceptance criteria: Document includes component tree diagram, build/deploy steps, and notes on Pinia usage.
+
+- [ ] FE-DOC-002: Capture migration retrospective
+  - Goal: Record lessons learned, remaining risks, and follow-up backlog items.
+  - Acceptance criteria: Retrospective doc published with wins, challenges, and recommendations for QE handoff.
 
 ---
 
