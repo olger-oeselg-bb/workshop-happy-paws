@@ -55,7 +55,7 @@ Legend
   - Goal: Set up a `frontend/` workspace using Vite with dev/build scripts wired into `package.json`.
   - Acceptance criteria: `npm run dev:frontend` serves the app with hot module replacement; Express can serve the production build output.
 
-- [ ] FE-TECH-003: Scaffold Pinia stores
+- [x] FE-TECH-003: Scaffold Pinia stores
   - Goal: Create a central store for pets, filters, active pet details, and UI messages.
   - Acceptance criteria: Store exposes actions for loading pets/profile data and managing medical records while maintaining current functionality.
 
@@ -66,6 +66,7 @@ Legend
 - [ ] FE-TECH-005: Implement AppShell layout
   - Goal: Provide a top-level layout component housing header, toast region, and router view.
   - Acceptance criteria: `<AppShell>` renders shared chrome with accessible landmarks and consumes Pinia UI state.
+  - Vue components should be single-file components storing html, js/ts and scss.
 
 - [ ] FE-TECH-006: Extract PetList and Filters components
   - Goal: Break the list view into reusable components backed by store state.
