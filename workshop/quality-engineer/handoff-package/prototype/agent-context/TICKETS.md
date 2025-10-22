@@ -66,6 +66,7 @@ Legend
 - [ ] FE-TECH-005: Implement AppShell layout
   - Goal: Provide a top-level layout component housing header, toast region, and router view.
   - Acceptance criteria: `<AppShell>` renders shared chrome with accessible landmarks and consumes Pinia UI state.
+  - Vue components should be single-file components storing html, js/ts and scss.
 
 - [ ] FE-TECH-006: Extract PetList and Filters components
   - Goal: Break the list view into reusable components backed by store state.
