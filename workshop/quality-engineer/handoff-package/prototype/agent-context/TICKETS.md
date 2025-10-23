@@ -59,7 +59,7 @@ Legend
   - Goal: Create a central store for pets, filters, active pet details, and UI messages.
   - Acceptance criteria: Store exposes actions for loading pets/profile data and managing medical records while maintaining current functionality.
 
-- [ ] FE-TECH-004: Adopt vue-router for navigation
+- [x] FE-TECH-004: Adopt vue-router for navigation
   - Goal: Replace manual hash handling with declarative routes (`/`, `/add`, `/pet/:id`).
   - Acceptance criteria: Router configuration created, navigation guards preserve existing behavior, and deep links load correct views.
 
