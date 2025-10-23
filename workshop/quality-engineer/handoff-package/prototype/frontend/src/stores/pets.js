@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
+import { petsApi } from '../api';
 
 /**
  * Pets Store
@@ -88,16 +89,9 @@ export const usePetsStore = defineStore('pets', () => {
   async function fetchPets(queryParams = {}) {
     loading.value = true;
     error.value = null;
-    
+
     try {
-      const params = new URLSearchParams(queryParams);
-      const response = await fetch(`/api/pets?${params}`);
-      
-      if (!response.ok) {
-        throw new Error(`Failed to fetch pets: ${response.statusText}`);
-      }
-      
-      pets.value = await response.json();
+      pets.value = await petsApi.fetchPets(queryParams);
       return pets.value;
     } catch (err) {
       error.value = err.message;
@@ -113,13 +107,7 @@ export const usePetsStore = defineStore('pets', () => {
     error.value = null;
     
     try {
-      const response = await fetch(`/api/pets/${id}`);
-      
-      if (!response.ok) {
-        throw new Error(`Failed to fetch pet: ${response.statusText}`);
-      }
-      
-      const pet = await response.json();
+      const pet = await petsApi.fetchPetById(id);
       activePet.value = pet;
       return pet;
     } catch (err) {
@@ -136,17 +124,7 @@ export const usePetsStore = defineStore('pets', () => {
     error.value = null;
     
     try {
-      const response = await fetch('/api/pets', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(petData)
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Failed to create pet: ${response.statusText}`);
-      }
-      
-      const newPet = await response.json();
+      const newPet = await petsApi.createPet(petData);
       pets.value.push(newPet);
       return newPet;
     } catch (err) {
@@ -163,17 +141,7 @@ export const usePetsStore = defineStore('pets', () => {
     error.value = null;
     
     try {
-      const response = await fetch(`/api/pets/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(changes)
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Failed to update pet: ${response.statusText}`);
-      }
-      
-      const updatedPet = await response.json();
+      const updatedPet = await petsApi.updatePet(id, changes);
       
       // Update in list
       const index = pets.value.findIndex(p => p.id === id);
