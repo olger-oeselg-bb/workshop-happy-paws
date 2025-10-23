@@ -84,7 +84,7 @@ Legend
   - Goal: Compose profile view from child components (status, gallery, medical records, audit log).
   - Acceptance criteria: Route loads data via Pinia actions, handles loading/error states, and reuses shared UI components.
 
-- [ ] FE-TECH-010: Implement MedicalRecords module
+- [x] FE-TECH-010: Implement MedicalRecords module
   - Goal: Create dedicated components/composables for listing and editing medical records.
   - Acceptance criteria: CRUD actions are driven through the store, inline edit form remains accessible, and aria-live announcements persist.
 

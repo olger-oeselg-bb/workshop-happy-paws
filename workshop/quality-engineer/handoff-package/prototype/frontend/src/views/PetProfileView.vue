@@ -31,6 +31,13 @@
         </div>
       </div>
 
+      <MedicalRecords
+        :pet-id="pet.id"
+        @record-added="handleRecordAdded"
+        @record-updated="handleRecordUpdated"
+        @record-deleted="handleRecordDeleted"
+      />
+
       <footer class="card-footer">
         <router-link class="link" :to="{ name: 'add-pet' }">Add another pet</router-link>
       </footer>
@@ -46,6 +53,7 @@ import { usePetsStore, useUIStore } from '@/stores';
 import PetGallery from '@/components/PetGallery.vue';
 import PetStatus from '@/components/PetStatus.vue';
 import PetDetails from '@/components/PetDetails.vue';
+import MedicalRecords from '@/components/MedicalRecords.vue';
 
 const router = useRouter();
 const route = useRoute();
@@ -120,6 +128,21 @@ function openLightbox(src) {
 function handlePhotoUpload({ petId, files }) {
   // For now, just log - photo upload functionality would be implemented later
   console.log('Upload photos for pet', petId, files);
+}
+
+function handleRecordAdded(record) {
+  // Medical record added - could emit to parent or handle locally
+  console.log('Medical record added:', record);
+}
+
+function handleRecordUpdated(record) {
+  // Medical record updated - could emit to parent or handle locally
+  console.log('Medical record updated:', record);
+}
+
+function handleRecordDeleted(recordId) {
+  // Medical record deleted - could emit to parent or handle locally
+  console.log('Medical record deleted:', recordId);
 }
 </script>
 
