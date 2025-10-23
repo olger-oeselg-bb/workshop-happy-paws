@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { petsApi } from '../api';
+import { useUIStore } from './ui';
 
 /**
  * Pets Store
@@ -87,6 +88,7 @@ export const usePetsStore = defineStore('pets', () => {
 
   // Actions
   async function fetchPets(queryParams = {}) {
+    const uiStore = useUIStore();
     loading.value = true;
     error.value = null;
 
@@ -96,6 +98,7 @@ export const usePetsStore = defineStore('pets', () => {
     } catch (err) {
       error.value = err.message;
       console.error('Error fetching pets:', err);
+      uiStore.showError(`Failed to load pets: ${err.message}`);
       throw err;
     } finally {
       loading.value = false;
@@ -103,6 +106,7 @@ export const usePetsStore = defineStore('pets', () => {
   }
 
   async function fetchPetById(id) {
+    const uiStore = useUIStore();
     loading.value = true;
     error.value = null;
     
@@ -113,6 +117,7 @@ export const usePetsStore = defineStore('pets', () => {
     } catch (err) {
       error.value = err.message;
       console.error('Error fetching pet:', err);
+      uiStore.showError(`Failed to load pet details: ${err.message}`);
       throw err;
     } finally {
       loading.value = false;
@@ -120,16 +125,19 @@ export const usePetsStore = defineStore('pets', () => {
   }
 
   async function createPet(petData) {
+    const uiStore = useUIStore();
     loading.value = true;
     error.value = null;
     
     try {
       const newPet = await petsApi.createPet(petData);
       pets.value.push(newPet);
+      uiStore.showSuccess(`${newPet.name} has been added successfully!`);
       return newPet;
     } catch (err) {
       error.value = err.message;
       console.error('Error creating pet:', err);
+      uiStore.showError(`Failed to add pet: ${err.message}`);
       throw err;
     } finally {
       loading.value = false;
@@ -137,6 +145,7 @@ export const usePetsStore = defineStore('pets', () => {
   }
 
   async function updatePet(id, changes) {
+    const uiStore = useUIStore();
     loading.value = true;
     error.value = null;
     
@@ -154,10 +163,12 @@ export const usePetsStore = defineStore('pets', () => {
         activePet.value = updatedPet;
       }
       
+      uiStore.showSuccess(`${updatedPet.name}'s information has been updated successfully!`);
       return updatedPet;
     } catch (err) {
       error.value = err.message;
       console.error('Error updating pet:', err);
+      uiStore.showError(`Failed to update pet: ${err.message}`);
       throw err;
     } finally {
       loading.value = false;

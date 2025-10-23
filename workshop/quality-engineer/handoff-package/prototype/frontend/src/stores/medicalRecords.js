@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { medicalRecordsApi } from '../api';
+import { useUIStore } from './ui';
 
 /**
  * Medical Records Store
@@ -14,6 +15,7 @@ export const useMedicalRecordsStore = defineStore('medicalRecords', () => {
 
   // Actions
   async function fetchMedicalRecords(petId) {
+    const uiStore = useUIStore();
     loading.value = true;
     error.value = null;
 
@@ -24,6 +26,7 @@ export const useMedicalRecordsStore = defineStore('medicalRecords', () => {
       error.value = err.message;
       console.error('Error fetching medical records:', err);
       records.value = [];
+      uiStore.showError(`Failed to load medical records: ${err.message}`);
       throw err;
     } finally {
       loading.value = false;
@@ -31,16 +34,19 @@ export const useMedicalRecordsStore = defineStore('medicalRecords', () => {
   }
 
   async function createMedicalRecord(petId, recordData) {
+    const uiStore = useUIStore();
     loading.value = true;
     error.value = null;
 
     try {
       const newRecord = await medicalRecordsApi.createMedicalRecord(petId, recordData);
       records.value.push(newRecord);
+      uiStore.showSuccess('Medical record added successfully!');
       return newRecord;
     } catch (err) {
       error.value = err.message;
       console.error('Error creating medical record:', err);
+      uiStore.showError(`Failed to add medical record: ${err.message}`);
       throw err;
     } finally {
       loading.value = false;
@@ -48,6 +54,7 @@ export const useMedicalRecordsStore = defineStore('medicalRecords', () => {
   }
 
   async function updateMedicalRecord(petId, recordId, changes) {
+    const uiStore = useUIStore();
     loading.value = true;
     error.value = null;
 
@@ -60,10 +67,12 @@ export const useMedicalRecordsStore = defineStore('medicalRecords', () => {
         records.value[index] = updatedRecord;
       }
 
+      uiStore.showSuccess('Medical record updated successfully!');
       return updatedRecord;
     } catch (err) {
       error.value = err.message;
       console.error('Error updating medical record:', err);
+      uiStore.showError(`Failed to update medical record: ${err.message}`);
       throw err;
     } finally {
       loading.value = false;
@@ -71,6 +80,7 @@ export const useMedicalRecordsStore = defineStore('medicalRecords', () => {
   }
 
   async function deleteMedicalRecord(petId, recordId) {
+    const uiStore = useUIStore();
     loading.value = true;
     error.value = null;
 
@@ -79,10 +89,12 @@ export const useMedicalRecordsStore = defineStore('medicalRecords', () => {
 
       // Remove from list
       records.value = records.value.filter(r => r.id !== recordId);
+      uiStore.showSuccess('Medical record deleted successfully!');
       return true;
     } catch (err) {
       error.value = err.message;
       console.error('Error deleting medical record:', err);
+      uiStore.showError(`Failed to delete medical record: ${err.message}`);
       throw err;
     } finally {
       loading.value = false;
