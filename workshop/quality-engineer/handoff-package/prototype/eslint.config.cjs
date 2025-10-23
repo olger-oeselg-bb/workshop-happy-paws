@@ -18,5 +18,13 @@ module.exports = [
       'no-undef': 'error',
       'no-console': 'off'
     }
+  },
+  {
+    files: ['frontend/**/*.js'],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'module',
+      globals: Object.assign({}, globals.browser, { __APP_ENV__: 'readonly' })
+    }
   }
 ]
