@@ -80,7 +80,7 @@ Legend
   - Goal: Move intake form logic into a dedicated component with validation helpers.
   - Acceptance criteria: Component emits `submit` with payload, manages photo uploads, and keeps aria attributes from the legacy form.
 
-- [ ] FE-TECH-009: Build PetProfile route module
+- [x] FE-TECH-009: Build PetProfile route module
   - Goal: Compose profile view from child components (status, gallery, medical records, audit log).
   - Acceptance criteria: Route loads data via Pinia actions, handles loading/error states, and reuses shared UI components.
 
