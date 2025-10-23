@@ -92,7 +92,7 @@ Legend
   - Goal: Provide reusable gallery/lightbox and upload triggers for pet media.
   - Acceptance criteria: Components support keyboard navigation, expose events for uploads, and display both primary and additional photos.
 
-- [ ] FE-TECH-012: Introduce API service layer
+- [x] FE-TECH-012: Introduce API service layer
   - Goal: Centralize network calls for pets, medical records, and audit logs.
   - Acceptance criteria: Modules under `src/api/` encapsulate fetch logic with shared error handling.
 
