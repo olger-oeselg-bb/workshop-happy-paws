@@ -1,3 +1,18 @@
+<template>
+  <div id="app">
+    <AppShell />
+  </div>
+</template>
+
+<script setup>
+import AppShell from '@/components/AppShell.vue';
+</script>
+
+<style scoped>
+.toast-region {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
   z-index: 9999;
   display: flex;
   flex-direction: column;
@@ -72,9 +87,7 @@
     transform: translateX(0);
   }
 }
-</style>
 
-<style scoped>
 .app-container {
   min-height: 100vh;
   display: flex;
