@@ -14,6 +14,7 @@ Workflow Instructions:
 
 1. Before each phase:
    - Create a **new feature branch** named after the phase (e.g., `feature/<phase-name>`).
+   - If you are on a non-feature branch, expect it to be the integration branch, don't switch to main, base your feature branch on the integration branch.
 
 2. During each phase:
    - Implement the features and changes described in the corresponding tickets.
