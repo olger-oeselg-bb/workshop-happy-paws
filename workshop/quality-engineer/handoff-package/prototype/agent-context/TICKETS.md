@@ -88,7 +88,7 @@ Legend
   - Goal: Create dedicated components/composables for listing and editing medical records.
   - Acceptance criteria: CRUD actions are driven through the store, inline edit form remains accessible, and aria-live announcements persist.
 
-- [ ] FE-TECH-011: Implement PhotoGallery and uploader components
+- [x] FE-TECH-011: Implement PhotoGallery and uploader components
   - Goal: Provide reusable gallery/lightbox and upload triggers for pet media.
   - Acceptance criteria: Components support keyboard navigation, expose events for uploads, and display both primary and additional photos.
 
