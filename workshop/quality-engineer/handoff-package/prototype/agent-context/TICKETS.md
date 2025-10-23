@@ -63,7 +63,7 @@ Legend
   - Goal: Replace manual hash handling with declarative routes (`/`, `/add`, `/pet/:id`).
   - Acceptance criteria: Router configuration created, navigation guards preserve existing behavior, and deep links load correct views.
 
-- [ ] FE-TECH-005: Implement AppShell layout
+- [x] FE-TECH-005: Implement AppShell layout
   - Goal: Provide a top-level layout component housing header, toast region, and router view.
   - Acceptance criteria: `<AppShell>` renders shared chrome with accessible landmarks and consumes Pinia UI state.
   - Vue components should be single-file components storing html, js/ts and scss.
