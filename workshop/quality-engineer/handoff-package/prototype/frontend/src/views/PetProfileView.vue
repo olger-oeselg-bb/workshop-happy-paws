@@ -13,39 +13,21 @@
     </section>
 
     <section v-else class="card">
-      <div class="profile">
-        <figure class="photo">
-          <img :src="pet.photoUrl || placeholderImage" :alt="pet.name" />
-        </figure>
-        <div class="details">
-          <dl>
-            <div class="row">
-              <dt>Status</dt>
-              <dd>
-                <select v-model="localStatus" @change="handleStatusChange">
-                  <option v-for="option in statusOptions" :key="option" :value="option">
-                    {{ option }}
-                  </option>
-                </select>
-              </dd>
-            </div>
-            <div class="row">
-              <dt>Type</dt>
-              <dd>{{ pet.type }}</dd>
-            </div>
-            <div class="row">
-              <dt>Breed</dt>
-              <dd>{{ pet.breed || 'Unknown' }}</dd>
-            </div>
-            <div class="row">
-              <dt>Age</dt>
-              <dd>{{ pet.age || 'Unlisted' }}</dd>
-            </div>
-            <div class="row">
-              <dt>Gender</dt>
-              <dd>{{ pet.gender || 'Unknown' }}</dd>
-            </div>
-          </dl>
+      <div class="profile-content">
+        <PetGallery
+          :pet="pet"
+          @lightbox-open="openLightbox"
+          @photos-upload="handlePhotoUpload"
+        />
+
+        <div class="details-section">
+          <PetStatus
+            v-model="localStatus"
+            :pet-id="pet.id"
+            @status-changed="handleStatusChange"
+          />
+
+          <PetDetails :pet="pet" />
         </div>
       </div>
 
@@ -61,6 +43,9 @@ import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { usePetsStore, useUIStore } from '@/stores';
+import PetGallery from '@/components/PetGallery.vue';
+import PetStatus from '@/components/PetStatus.vue';
+import PetDetails from '@/components/PetDetails.vue';
 
 const router = useRouter();
 const route = useRoute();
@@ -68,10 +53,8 @@ const petsStore = usePetsStore();
 const uiStore = useUIStore();
 
 const { activePet, loading } = storeToRefs(petsStore);
-const placeholderImage = '/images/placeholder.svg';
 
-const statusOptions = ['In Shelter', 'Pending Adoption', 'Adopted', 'Not Available'];
-const localStatus = ref(statusOptions[0]);
+const localStatus = ref('In Shelter');
 
 const pet = computed(() => activePet.value);
 const createdAt = computed(() => {
@@ -89,7 +72,7 @@ const createdAt = computed(() => {
 
 watch(pet, async (next) => {
   if (!next) return;
-  localStatus.value = next.status || statusOptions[0];
+  localStatus.value = next.status || 'In Shelter';
 });
 
 watch(
@@ -119,18 +102,24 @@ function goBack() {
   router.push({ name: 'home' });
 }
 
-async function handleStatusChange() {
-  if (!pet.value) return;
-  const newStatus = localStatus.value;
-  if (newStatus === pet.value.status) return;
-
+async function handleStatusChange({ petId, status }) {
   try {
-    await petsStore.updatePet(pet.value.id, { status: newStatus });
-    uiStore.showSuccess(`${pet.value.name}'s status updated to ${newStatus}.`);
+    await petsStore.updatePet(petId, { status });
+    uiStore.showSuccess(`${pet.value.name}'s status updated to ${status}.`);
   } catch (err) {
     localStatus.value = pet.value.status;
     uiStore.showError(err?.message || 'Unable to update status.');
   }
+}
+
+function openLightbox(src) {
+  // For now, just log - lightbox functionality would be implemented later
+  console.log('Open lightbox for:', src);
+}
+
+function handlePhotoUpload({ petId, files }) {
+  // For now, just log - photo upload functionality would be implemented later
+  console.log('Upload photos for pet', petId, files);
 }
 </script>
 
@@ -167,6 +156,7 @@ async function handleStatusChange() {
   border: none;
   padding: 0;
   cursor: pointer;
+  text-decoration: none;
 }
 
 .card {
@@ -179,59 +169,19 @@ async function handleStatusChange() {
   box-shadow: 0 10px 18px rgba(15, 23, 42, 0.08);
 }
 
-.profile {
+.profile-content {
   display: flex;
   flex-wrap: wrap;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.details-section {
+  display: flex;
+  flex-direction: column;
   gap: 1.5rem;
-}
-
-.photo {
-  flex: 0 0 260px;
-  aspect-ratio: 4 / 3;
-  border-radius: 12px;
-  overflow: hidden;
-  margin: 0;
-  background: #e5e7eb;
-}
-
-.photo img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.details {
   flex: 1;
-}
-
-dl {
-  display: grid;
-  gap: 1rem;
-  margin: 0;
-}
-
-.row {
-  display: grid;
-  grid-template-columns: 140px 1fr;
-  gap: 0.75rem;
-  align-items: center;
-}
-
-dt {
-  font-weight: 600;
-  color: #4b5563;
-}
-
-dd {
-  margin: 0;
-  color: #1f2937;
-}
-
-select {
-  width: 100%;
-  padding: 0.6rem 0.75rem;
-  border-radius: 8px;
-  border: 1px solid #d1d5db;
+  min-width: 280px;
 }
 
 .card-footer {
@@ -253,12 +203,13 @@ select {
 }
 
 @media (max-width: 720px) {
-  .row {
-    grid-template-columns: 1fr;
+  .profile-content {
+    flex-direction: column;
+    gap: 1.5rem;
   }
 
-  .photo {
-    flex: 1 1 100%;
+  .details-section {
+    min-width: auto;
   }
 }
 </style>
