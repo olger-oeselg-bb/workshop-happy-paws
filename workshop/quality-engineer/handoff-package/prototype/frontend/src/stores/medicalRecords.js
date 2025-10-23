@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
+import { medicalRecordsApi } from '../api';
 
 /**
  * Medical Records Store
@@ -17,13 +18,7 @@ export const useMedicalRecordsStore = defineStore('medicalRecords', () => {
     error.value = null;
 
     try {
-      const response = await fetch(`/api/pets/${petId}/medical-records`);
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch medical records: ${response.statusText}`);
-      }
-
-      records.value = await response.json();
+      records.value = await medicalRecordsApi.fetchMedicalRecords(petId);
       return records.value;
     } catch (err) {
       error.value = err.message;
@@ -40,17 +35,7 @@ export const useMedicalRecordsStore = defineStore('medicalRecords', () => {
     error.value = null;
 
     try {
-      const response = await fetch(`/api/pets/${petId}/medical-records`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(recordData)
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to create medical record: ${response.statusText}`);
-      }
-
-      const newRecord = await response.json();
+      const newRecord = await medicalRecordsApi.createMedicalRecord(petId, recordData);
       records.value.push(newRecord);
       return newRecord;
     } catch (err) {
@@ -67,17 +52,7 @@ export const useMedicalRecordsStore = defineStore('medicalRecords', () => {
     error.value = null;
 
     try {
-      const response = await fetch(`/api/pets/${petId}/medical-records/${recordId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(changes)
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to update medical record: ${response.statusText}`);
-      }
-
-      const updatedRecord = await response.json();
+      const updatedRecord = await medicalRecordsApi.updateMedicalRecord(petId, recordId, changes);
 
       // Update in list
       const index = records.value.findIndex(r => r.id === recordId);
@@ -100,13 +75,7 @@ export const useMedicalRecordsStore = defineStore('medicalRecords', () => {
     error.value = null;
 
     try {
-      const response = await fetch(`/api/pets/${petId}/medical-records/${recordId}`, {
-        method: 'DELETE'
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to delete medical record: ${response.statusText}`);
-      }
+      await medicalRecordsApi.deleteMedicalRecord(petId, recordId);
 
       // Remove from list
       records.value = records.value.filter(r => r.id !== recordId);
