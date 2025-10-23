@@ -100,7 +100,7 @@ Legend
   - Goal: Ensure stores delegate HTTP concerns to the new service modules.
   - Acceptance criteria: Stores manage loading/error flags, update state predictably, and expose success/failure events for the UI store.
 
-- [ ] FE-TECH-014: Add UI feedback store
+- [x] FE-TECH-014: Add UI feedback store
   - Goal: Provide a Pinia store for toast/alert messaging and modal coordination.
   - Acceptance criteria: `<ToastRegion>` consumes the store, supports multiple variants, and replaces legacy `message`/`toast` refs.
 
