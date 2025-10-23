@@ -76,7 +76,7 @@ Legend
   - Goal: Encapsulate card markup, status badge, and click handling.
   - Acceptance criteria: Component accepts a pet prop, emits select events, and supports keyboard activation with descriptive alt text.
 
-- [ ] FE-TECH-008: Isolate AddPetForm component
+- [x] FE-TECH-008: Isolate AddPetForm component
   - Goal: Move intake form logic into a dedicated component with validation helpers.
   - Acceptance criteria: Component emits `submit` with payload, manages photo uploads, and keeps aria attributes from the legacy form.
 
