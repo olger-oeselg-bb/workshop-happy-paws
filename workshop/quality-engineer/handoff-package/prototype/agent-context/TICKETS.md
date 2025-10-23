@@ -96,7 +96,7 @@ Legend
   - Goal: Centralize network calls for pets, medical records, and audit logs.
   - Acceptance criteria: Modules under `src/api/` encapsulate fetch logic with shared error handling.
 
-- [ ] FE-TECH-013: Wire Pinia actions to API layer
+- [x] FE-TECH-013: Wire Pinia actions to API layer
   - Goal: Ensure stores delegate HTTP concerns to the new service modules.
   - Acceptance criteria: Stores manage loading/error flags, update state predictably, and expose success/failure events for the UI store.
 
