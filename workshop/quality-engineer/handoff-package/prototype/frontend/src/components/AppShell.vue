@@ -1,6 +1,6 @@
 <template>
   <div class="app-shell">
-    <header class="app-header">
+    <header class="app-header" role="banner">
       <div class="brand">
         <router-link class="brand-link" :to="{ name: 'home' }">
           <span class="brand-icon" aria-hidden="true">🐾</span>
@@ -9,26 +9,37 @@
         <p class="brand-tagline">Pet Registry System</p>
       </div>
 
-      <nav class="nav">
+      <nav class="nav" role="navigation" aria-label="Main navigation">
         <router-link class="nav-link" :to="{ name: 'home' }">Pet List</router-link>
         <router-link class="nav-link" :to="{ name: 'add-pet' }">Add Pet</router-link>
       </nav>
     </header>
 
-    <main class="app-main">
+    <main class="app-main" role="main">
       <slot />
     </main>
 
-    <footer class="app-footer">
+    <footer class="app-footer" role="contentinfo">
       <p>Vue 3 + Pinia migration · Phase 2 in progress</p>
     </footer>
+
+    <!-- Global Loading Overlay -->
+    <div v-if="globalLoading" class="loading-overlay" aria-live="polite" aria-label="Loading content">
+      <div class="loading-spinner" aria-hidden="true"></div>
+      <p>Loading…</p>
+    </div>
 
     <ToastRegion />
   </div>
 </template>
 
 <script setup>
+import { storeToRefs } from 'pinia';
+import { useUIStore } from '@/stores';
 import ToastRegion from './ToastRegion.vue';
+
+const uiStore = useUIStore();
+const { globalLoading } = storeToRefs(uiStore);
 </script>
 
 <style scoped>
@@ -110,6 +121,36 @@ import ToastRegion from './ToastRegion.vue';
   color: #6b7280;
   background: #ffffff;
   border-top: 1px solid #e5e7eb;
+}
+
+/* Global Loading Overlay */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e5e7eb;
+  border-top: 4px solid #4c51bf;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 @media (max-width: 600px) {
