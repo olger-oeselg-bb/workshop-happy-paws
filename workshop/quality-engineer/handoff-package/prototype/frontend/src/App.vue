@@ -74,7 +74,6 @@
 }
 </style>
 
-
 <style scoped>
 .app-container {
   min-height: 100vh;

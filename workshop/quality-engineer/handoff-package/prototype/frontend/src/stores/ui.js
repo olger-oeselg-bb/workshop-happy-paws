@@ -149,7 +149,7 @@ export const useUIStore = defineStore('ui', () => {
    */
   function confirm({ title, message, confirmText = 'Confirm', cancelText = 'Cancel' }) {
     return new Promise((resolve) => {
-      const id = openModal({
+      openModal({
         component: 'ConfirmDialog',
         props: { title, message, confirmText, cancelText },
         onClose: () => resolve(false),

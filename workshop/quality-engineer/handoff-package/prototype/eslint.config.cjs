@@ -3,7 +3,7 @@ const globals = require('globals')
 
 module.exports = [
   {
-    ignores: ['node_modules/**', 'db.json', 'static/**', 'coverage/**', '.github/**']
+    ignores: ['node_modules/**', 'db.json', 'static/**', 'coverage/**', '.github/**', 'dist/**']
   },
   {
     files: ['**/*.js'],
