@@ -9,7 +9,6 @@ export const usePetsStore = defineStore('pets', () => {
   // State
   const pets = ref([]);
   const activePet = ref(null);
-  const medicalRecords = ref([]);
   const filters = ref({
     search: '',
     type: 'All',
@@ -86,114 +85,6 @@ export const usePetsStore = defineStore('pets', () => {
   });
 
   // Actions
-  async function fetchMedicalRecords(petId) {
-    loading.value = true;
-    error.value = null;
-    
-    try {
-      const response = await fetch(`/api/pets/${petId}/medical-records`);
-      
-      if (!response.ok) {
-        throw new Error(`Failed to fetch medical records: ${response.statusText}`);
-      }
-      
-      medicalRecords.value = await response.json();
-      return medicalRecords.value;
-    } catch (err) {
-      error.value = err.message;
-      console.error('Error fetching medical records:', err);
-      medicalRecords.value = [];
-      throw err;
-    } finally {
-      loading.value = false;
-    }
-  }
-
-  async function createMedicalRecord(petId, recordData) {
-    loading.value = true;
-    error.value = null;
-    
-    try {
-      const response = await fetch(`/api/pets/${petId}/medical-records`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(recordData)
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Failed to create medical record: ${response.statusText}`);
-      }
-      
-      const newRecord = await response.json();
-      medicalRecords.value.push(newRecord);
-      return newRecord;
-    } catch (err) {
-      error.value = err.message;
-      console.error('Error creating medical record:', err);
-      throw err;
-    } finally {
-      loading.value = false;
-    }
-  }
-
-  async function updateMedicalRecord(petId, recordId, changes) {
-    loading.value = true;
-    error.value = null;
-    
-    try {
-      const response = await fetch(`/api/pets/${petId}/medical-records/${recordId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(changes)
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Failed to update medical record: ${response.statusText}`);
-      }
-      
-      const updatedRecord = await response.json();
-      
-      // Update in list
-      const index = medicalRecords.value.findIndex(r => r.id === recordId);
-      if (index !== -1) {
-        medicalRecords.value[index] = updatedRecord;
-      }
-      
-      return updatedRecord;
-    } catch (err) {
-      error.value = err.message;
-      console.error('Error updating medical record:', err);
-      throw err;
-    } finally {
-      loading.value = false;
-    }
-  }
-
-  async function deleteMedicalRecord(petId, recordId) {
-    loading.value = true;
-    error.value = null;
-    
-    try {
-      const response = await fetch(`/api/pets/${petId}/medical-records/${recordId}`, {
-        method: 'DELETE'
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Failed to delete medical record: ${response.statusText}`);
-      }
-      
-      // Remove from list
-      medicalRecords.value = medicalRecords.value.filter(r => r.id !== recordId);
-      return true;
-    } catch (err) {
-      error.value = err.message;
-      console.error('Error deleting medical record:', err);
-      throw err;
-    } finally {
-      loading.value = false;
-    }
-  }
-
   async function fetchPets(queryParams = {}) {
     loading.value = true;
     error.value = null;
@@ -332,7 +223,6 @@ export const usePetsStore = defineStore('pets', () => {
     // State
     pets,
     activePet,
-    medicalRecords,
     filters,
     loading,
     error,
@@ -346,10 +236,6 @@ export const usePetsStore = defineStore('pets', () => {
     fetchPetById,
     createPet,
     updatePet,
-    fetchMedicalRecords,
-    createMedicalRecord,
-    updateMedicalRecord,
-    deleteMedicalRecord,
     setFilters,
     resetFilters,
     clearActivePet,

@@ -9,11 +9,11 @@
     </div>
 
     <div v-else>
-      <div v-if="records.length === 0" class="empty-state">No records yet.</div>
+      <div v-if="recordsList.length === 0" class="empty-state">No records yet.</div>
 
       <ul v-else class="records-list">
         <li
-          v-for="record in records"
+          v-for="record in recordsList"
           :key="record.id"
           class="record-item"
         >
@@ -172,7 +172,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
-import { usePetsStore, useUIStore } from '@/stores';
+import { useMedicalRecordsStore, useUIStore } from '@/stores';
 
 const props = defineProps({
   petId: {
@@ -183,15 +183,15 @@ const props = defineProps({
 
 const emit = defineEmits(['record-added', 'record-updated', 'record-deleted']);
 
-const petsStore = usePetsStore();
+const medicalRecordsStore = useMedicalRecordsStore();
 const uiStore = useUIStore();
 
-const { medicalRecords, loading, error } = storeToRefs(petsStore);
+const { records, loading, error } = storeToRefs(medicalRecordsStore);
 
 const editingRecord = ref(null);
 const isSubmitting = ref(false);
 
-const records = computed(() => medicalRecords.value);
+const recordsList = computed(() => records.value);
 
 const newRecord = ref({
   notes: '',
@@ -217,7 +217,7 @@ function formatDate(dateString) {
 // Load medical records when component mounts
 onMounted(async () => {
   try {
-    await petsStore.fetchMedicalRecords(props.petId);
+    await medicalRecordsStore.fetchMedicalRecords(props.petId);
   } catch (err) {
     uiStore.showError('Failed to load medical records');
   }
@@ -235,7 +235,7 @@ async function saveEdit() {
   if (!editingRecord.value) return;
 
   try {
-    const updated = await petsStore.updateMedicalRecord(
+    const updated = await medicalRecordsStore.updateMedicalRecord(
       props.petId,
       editingRecord.value.id,
       editingRecord.value
@@ -252,7 +252,7 @@ async function confirmDelete(record) {
   if (!confirm('Are you sure you want to delete this medical record?')) return;
 
   try {
-    await petsStore.deleteMedicalRecord(props.petId, record.id);
+    await medicalRecordsStore.deleteMedicalRecord(props.petId, record.id);
     uiStore.showSuccess('Medical record deleted successfully');
     emit('record-deleted', record.id);
   } catch (err) {
@@ -265,7 +265,7 @@ async function addRecord() {
 
   isSubmitting.value = true;
   try {
-    const record = await petsStore.createMedicalRecord(props.petId, newRecord.value);
+    const record = await medicalRecordsStore.createMedicalRecord(props.petId, newRecord.value);
     newRecord.value = {
       notes: '',
       vet: '',
