@@ -72,7 +72,7 @@ Legend
   - Goal: Break the list view into reusable components backed by store state.
   - Acceptance criteria: `<PetList>` and `<PetFilters>` render pet cards, handle filter changes, and preserve existing accessibility enhancements.
 
-- [ ] FE-TECH-007: Create PetCard component
+- [x] FE-TECH-007: Create PetCard component
   - Goal: Encapsulate card markup, status badge, and click handling.
   - Acceptance criteria: Component accepts a pet prop, emits select events, and supports keyboard activation with descriptive alt text.
 
