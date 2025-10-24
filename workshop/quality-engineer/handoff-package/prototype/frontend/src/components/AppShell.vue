@@ -20,7 +20,7 @@
     </main>
 
     <footer class="app-footer" role="contentinfo">
-      <p>Vue 3 + Pinia migration · Phase 2 in progress</p>
+      <p>Happy Paws Animal Shelter © 2025</p>
     </footer>
 
     <!-- Global Loading Overlay -->
