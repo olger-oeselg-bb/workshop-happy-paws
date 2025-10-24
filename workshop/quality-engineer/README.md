@@ -19,7 +19,7 @@ As a **Quality Engineer**, your task is to **validate the solution**, ensure it 
 
 ## Instructions for Quality Engineer Role
 
-### 1. Review BA & SE Deliverables
+### 1. Review BA & SE Deliverables: the handoff package
 - Read through the **user stories, acceptance criteria, and visuals** produced by Business Analysts.  
 - Explore the **codebase and README** delivered by Software Engineers.  
 - Clarify which features are in scope for the **MVP (Minimum Viable Product)**:  
