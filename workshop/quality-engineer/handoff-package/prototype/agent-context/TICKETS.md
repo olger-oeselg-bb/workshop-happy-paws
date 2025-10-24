@@ -112,7 +112,7 @@ Legend
   - Goal: Remove monolithic script once Vite-based app reaches parity.
   - Acceptance criteria: Build artifacts served by Express, legacy file deleted, and rollback instructions noted in docs.
 
-- [ ] FE-TEST-001: Add component unit test coverage
+- [x] FE-TEST-001: Add component unit test coverage
   - Goal: Introduce Vitest + Vue Test Utils for critical components (e.g., PetList, MedicalRecords, StatusSelect).
   - Acceptance criteria: Test suite runs via `npm run test:unit`, covers happy paths and edge cases, and integrates with CI.
 
