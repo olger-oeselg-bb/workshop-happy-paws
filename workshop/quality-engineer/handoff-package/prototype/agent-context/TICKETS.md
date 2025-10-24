@@ -108,7 +108,7 @@ Legend
   - Goal: Validate that the new component architecture maintains or improves accessibility.
   - Acceptance criteria: Documented axe-core (or similar) audit with issues resolved or logged in backlog, including keyboard navigation verification.
 
-- [ ] FE-TECH-016: Retire legacy `static/app.js`
+- [x] FE-TECH-016: Retire legacy `static/app.js`
   - Goal: Remove monolithic script once Vite-based app reaches parity.
   - Acceptance criteria: Build artifacts served by Express, legacy file deleted, and rollback instructions noted in docs.
 
