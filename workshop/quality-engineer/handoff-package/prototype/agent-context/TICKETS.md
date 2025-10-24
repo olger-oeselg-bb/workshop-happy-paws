@@ -120,10 +120,6 @@ Legend
   - Goal: Reflect new tooling, component structure, and state management approach in `ARCHITECTURE.md`.
   - Acceptance criteria: Document includes component tree diagram, build/deploy steps, and notes on Pinia usage.
 
-- [ ] FE-DOC-002: Capture migration retrospective
-  - Goal: Record lessons learned, remaining risks, and follow-up backlog items.
-  - Acceptance criteria: Retrospective doc published with wins, challenges, and recommendations for QE handoff.
-
 ---
 
 ## Improvements & Tech debt (observations during development)
