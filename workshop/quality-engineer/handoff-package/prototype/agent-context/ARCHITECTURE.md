@@ -40,6 +40,187 @@ This document describes the architecture of the prototype included in this hando
 - `src/test/` — Vitest unit tests for Vue components and Pinia stores (setup, components, stores).
 - `package.json` — scripts for `start`, `dev:frontend`, `build:frontend`, `lint`, `test`, `test:unit` and project dependencies.
 
+## Vue 3 Component Architecture
+
+### Component Tree Diagram
+
+```
+App.vue (Root)
+├── AppShell.vue (Layout wrapper)
+│   ├── layouts/AppLayout.vue (Header & navigation)
+│   ├── router-view (Dynamic content)
+│   │   ├── HomeView.vue (Pet listing page)
+│   │   │   ├── PetFilters.vue (Search & filter controls)
+│   │   │   └── PetList.vue (Pet grid)
+│   │   │       └── PetCard.vue (Individual pet card)
+│   │   ├── AddPetView.vue (Add pet form page)
+│   │   │   └── AddPetForm.vue (Pet intake form)
+│   │   │       ├── PhotoUploader.vue (File upload component)
+│   │   │       └── ToastRegion.vue (Feedback messages)
+│   │   └── PetProfileView.vue (Pet details page)
+│   │       ├── PetDetails.vue (Pet information display)
+│   │       ├── PetStatus.vue (Status selector)
+│   │       ├── PhotoGallery.vue (Photo display)
+│   │       ├── MedicalRecords.vue (Medical history)
+│   │       └── ToastRegion.vue (Feedback messages)
+│   └── ToastRegion.vue (Global notifications)
+```
+
+### Component Responsibilities
+
+- **App.vue**: Root component, initializes Pinia stores and router
+- **AppShell.vue**: Layout wrapper providing consistent structure and global UI state
+- **Views**: Route-level components handling page-specific logic and data loading
+- **Components**: Reusable UI components focused on specific functionality
+- **Layouts**: Structural components providing consistent page layouts
+
+### State Management (Pinia)
+
+The application uses Pinia stores with Vue 3 Composition API pattern:
+
+#### Pets Store (`stores/pets.js`)
+- **State**: pets[], activePet, filters{}, loading, error
+- **Getters**: filteredPets (computed), petCount, filteredCount, petsByStatus
+- **Actions**: fetchPets(), fetchPetById(), createPet(), updatePet(), setFilters(), resetFilters()
+- **Usage**: Manages all pet-related data and filtering logic
+
+#### UI Store (`stores/ui.js`)
+- **State**: toasts[], modals[], globalLoading
+- **Actions**: showSuccess(), showError(), showInfo(), clearToast(), showModal(), hideModal()
+- **Usage**: Handles cross-cutting UI concerns like notifications and modal dialogs
+
+#### Medical Records Store (`stores/medicalRecords.js`)
+- **State**: records[], loading, error
+- **Actions**: fetchRecords(), createRecord(), updateRecord(), deleteRecord()
+- **Usage**: Manages medical record CRUD operations
+
+### API Service Layer
+
+Centralized HTTP communication under `src/api/`:
+
+- **http.js**: Base HTTP client with error handling and interceptors
+- **pets.js**: Pet-related API calls (CRUD operations)
+- **medicalRecords.js**: Medical record API calls
+- **index.js**: Service exports and shared utilities
+
+### Router Configuration
+
+Vue Router with history mode and route-level code splitting:
+
+- **/**: HomeView (pet listing with filters)
+- **/add**: AddPetView (pet intake form)
+- **/pet/:id**: PetProfileView (individual pet details)
+
+Router guards ensure data is loaded before route activation and support legacy hash-based navigation.
+
+## Pinia Store Patterns & Best Practices
+
+### Store Structure
+
+All stores follow the Composition API pattern with consistent structure:
+
+```javascript
+import { defineStore } from 'pinia'
+import { ref, computed } from 'vue'
+
+export const useStoreName = defineStore('storeName', () => {
+  // State
+  const state = ref(initialValue)
+  
+  // Getters (computed properties)
+  const computedProperty = computed(() => {
+    return state.value.someCalculation()
+  })
+  
+  // Actions (async functions)
+  const asyncAction = async (params) => {
+    try {
+      // Business logic
+      state.value = newValue
+    } catch (error) {
+      // Error handling
+    }
+  }
+  
+  return {
+    // Exposed state
+    state,
+    // Exposed getters
+    computedProperty,
+    // Exposed actions
+    asyncAction
+  }
+})
+```
+
+### Usage in Components
+
+```javascript
+import { usePetsStore } from '@/stores/pets'
+import { useUIStore } from '@/stores/ui'
+
+export default {
+  setup() {
+    const petsStore = usePetsStore()
+    const uiStore = useUIStore()
+    
+    // Reactive state access
+    const pets = computed(() => petsStore.pets)
+    const loading = computed(() => petsStore.loading)
+    
+    // Actions
+    const loadPets = async () => {
+      try {
+        await petsStore.fetchPets()
+      } catch (error) {
+        uiStore.showError('Failed to load pets')
+      }
+    }
+    
+    return {
+      pets,
+      loading,
+      loadPets
+    }
+  }
+}
+```
+
+### Store Communication
+
+- **Store-to-Store**: Stores can import and use other stores directly
+- **Store-to-API**: Stores call API services for data operations
+- **Store-to-UI**: UI store handles cross-cutting concerns like notifications
+- **Reactive Updates**: All store state is reactive and updates components automatically
+
+### Error Handling
+
+- Actions catch errors and update error state
+- UI store provides user-friendly error notifications
+- Components handle loading states and error display
+- API layer provides consistent error responses
+
+### Testing Stores
+
+Stores are tested with Vitest using mocking for API calls:
+
+```javascript
+import { describe, it, expect, vi } from 'vitest'
+import { setActivePinia, createPinia } from 'pinia'
+import { usePetsStore } from '@/stores/pets'
+
+describe('Pets Store', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia())
+  })
+  
+  it('fetches pets successfully', async () => {
+    const store = usePetsStore()
+    // Mock API and test behavior
+  })
+})
+```
+
 ## API contract (summary)
 
 All API paths are mounted under `/api`.
@@ -131,6 +312,73 @@ Helpful scripts:
 - `npm run lint` — run ESLint
 - `npm test` — run Playwright E2E tests (requires Playwright dependencies; see package.json)
 - `npm run test:unit` — run Vitest unit tests for Vue components and Pinia stores
+
+### Development Workflow
+
+1. **Install Dependencies**
+   ```bash
+   npm install
+   ```
+
+2. **Start Development Server**
+   ```bash
+   npm run dev:frontend  # Frontend only (port 5173)
+   npm start             # Full stack (backend + frontend)
+   ```
+
+3. **Run Tests**
+   ```bash
+   npm run test:unit     # Unit tests with Vitest
+   npm run test          # E2E tests with Playwright
+   npm run lint          # ESLint code quality checks
+   ```
+
+4. **Build for Production**
+   ```bash
+   npm run build:frontend  # Build Vue app to dist/
+   ```
+
+### Production Deployment
+
+1. **Build Process**
+   - Vite optimizes and bundles the Vue application
+   - Static assets are processed and minified
+   - Output directory: `frontend/dist/`
+
+2. **Backend Deployment**
+   - Express server serves static files from `frontend/dist/`
+   - API endpoints remain active for data operations
+   - Environment variables configured for production
+
+3. **Static Asset Handling**
+   - Images and uploads stored in `uploads/` directory
+   - Served directly by Express with appropriate headers
+   - Pet photos optimized and cached
+
+### Testing Strategy
+
+#### Unit Testing (Vitest + Vue Test Utils)
+- **Framework**: Vitest with jsdom environment
+- **Coverage**: Components, stores, utilities
+- **Mocking**: Browser APIs, HTTP requests, router
+- **CI Integration**: Runs on every commit
+
+#### E2E Testing (Playwright)
+- **Browser Coverage**: Chrome, Firefox, Safari
+- **Scenarios**: User journeys, form submissions, navigation
+- **CI Integration**: Runs on deployment pipeline
+
+#### Accessibility Testing
+- **Tools**: Vue Test Utils accessibility assertions
+- **Standards**: WCAG 2.1 AA compliance
+- **Coverage**: Color contrast, keyboard navigation, screen reader support
+
+### Code Quality
+
+- **Linting**: ESLint with Vue 3 and test file support
+- **Formatting**: Prettier integration (via ESLint)
+- **Type Checking**: JSDoc annotations for better IDE support
+- **Pre-commit Hooks**: Automated quality checks
 
 
 ## Error modes and edge cases
