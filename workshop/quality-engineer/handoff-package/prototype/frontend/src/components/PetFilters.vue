@@ -72,6 +72,7 @@ function resetAll() {
 .filters {
   display: flex;
   flex-wrap: wrap;
+  align-items: end;
   gap: 1rem;
   padding: 1rem;
   border-radius: 8px;
@@ -123,6 +124,8 @@ function resetAll() {
   font-weight: 500;
   cursor: pointer;
   transition: background-color 0.2s ease, border-color 0.2s ease;
+  box-sizing: border-box;
+  height: 2.25rem;
 }
 
 .reset:hover {
