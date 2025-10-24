@@ -28,11 +28,11 @@ module.exports = [
     }
   },
   {
-    files: ['tests/**/*.js'],
+    files: ['src/test/**/*.js'],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: 'module',
       globals: Object.assign({}, globals.browser, globals.jest)
     }
-  }
+  },
 ]

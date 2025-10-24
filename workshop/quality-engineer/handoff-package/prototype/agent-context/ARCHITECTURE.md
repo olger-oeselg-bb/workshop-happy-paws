@@ -12,7 +12,7 @@ This document describes the architecture of the prototype included in this hando
 - State Management: Pinia stores (Composition API) for pets data and UI feedback (toasts, modals).
 - Build System: Vite 6.4+ with Vue plugin, HMR, and API proxy to backend during development.
 - Logging: pino is used (module `src/logger.js`) with pretty-print transport in development.
-- Tests: a Playwright E2E test is included under `tests/` (minimal, intended as an example for QEs to extend).
+- Tests: Playwright E2E tests in `tests/` (minimal, intended as an example for QEs to extend) and Vitest unit tests in `src/test/` for Vue components and Pinia stores.
 - Lint/format: ESLint (flat config) + Prettier are configured for fast developer feedback.
 
 ## File layout (important files)
@@ -36,8 +36,9 @@ This document describes the architecture of the prototype included in this hando
   - `app.js` — small Vue app with a hash-based router and views: list, add, profile.
   - `styles.css` — styles including status badges and select styles.
 - `dist/` — Production build output from Vite (git-ignored, created by `npm run build:frontend`).
-- `tests/` — Playwright tests (example E2E).
-- `package.json` — scripts for `start`, `dev:frontend`, `build:frontend`, `lint`, `test` and project dependencies.
+- `tests/` — Playwright E2E tests (example E2E).
+- `src/test/` — Vitest unit tests for Vue components and Pinia stores (setup, components, stores).
+- `package.json` — scripts for `start`, `dev:frontend`, `build:frontend`, `lint`, `test`, `test:unit` and project dependencies.
 
 ## API contract (summary)
 
@@ -128,7 +129,8 @@ Helpful scripts:
 - `npm run build:frontend` — build production bundle to `dist/`
 - `npm start` — start Express server (serves `dist/` if available, otherwise `static/`)
 - `npm run lint` — run ESLint
-- `npm test` — run Playwright tests (requires Playwright dependencies; see package.json)
+- `npm test` — run Playwright E2E tests (requires Playwright dependencies; see package.json)
+- `npm run test:unit` — run Vitest unit tests for Vue components and Pinia stores
 
 
 ## Error modes and edge cases
@@ -144,7 +146,7 @@ Helpful scripts:
 - Adding Vue components: create `.vue` files in `frontend/src/components/` and import into parent components.
 - Adding Pinia stores: create new store files in `frontend/src/stores/` following the Composition API pattern (see `pets.js` and `ui.js` examples).
 - Adding fields: update the frontend components/stores and the DB helpers to persist the new fields.
-- Adding tests: add Playwright tests under `tests/` and use `npm test`.
+- Adding tests: add Playwright E2E tests under `tests/` and Vitest unit tests under `src/test/` (use `npm test` for E2E, `npm run test:unit` for unit tests).
 - Replacing lowdb: implement a new DB layer in `src/db.js` that follows the existing helper function names (initDb, getPets, addPet...) and swap to a real DB connection.
 
 
@@ -152,7 +154,7 @@ Helpful scripts:
 
 - Use `POST /api/reset` to reset the dataset before a test run.
 - `db.json` can be inspected to verify persisted records.
-- Playwright tests in `tests/` are intentionally minimal — add tests that reflect real QA workflows: create pet, change status, add medical record, and verify persistence.
+- Playwright E2E tests in `tests/` and Vitest unit tests in `src/test/` are included — add tests that reflect real QA workflows: create pet, change status, add medical record, and verify persistence. Unit tests cover Vue components and Pinia stores for regression testing.
 - The Vite dev server (port 5173) is recommended for testing during active development due to HMR. Production builds should be tested via `npm start` (port 3000) after running `npm run build:frontend`.
 - Both frontend versions (legacy `static/` and new `frontend/`) share the same Express API, so backend testing remains consistent.
 
