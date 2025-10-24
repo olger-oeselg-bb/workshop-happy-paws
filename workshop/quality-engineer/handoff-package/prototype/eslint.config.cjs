@@ -35,4 +35,20 @@ module.exports = [
       globals: Object.assign({}, globals.browser, globals.jest)
     }
   },
+  {
+    files: ['**/*.mjs'],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'module',
+      globals: Object.assign({}, globals.node)
+    }
+  },
+  {
+    files: ['tests/**/*.spec.js'],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'module',
+      globals: Object.assign({}, globals.browser, globals.node)
+    }
+  },
 ]
