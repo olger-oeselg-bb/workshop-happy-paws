@@ -9,12 +9,12 @@
       <p class="empty-text">No photos available</p>
     </div>
 
-    <div v-else class="photos-grid" role="grid">
+    <div v-else class="photos-grid" role="list">
       <div
         v-for="(photo, index) in photos"
         :key="photo.id || index"
         class="photo-item"
-        role="gridcell"
+        role="listitem"
         tabindex="0"
         :aria-label="`Photo ${index + 1} of ${photos.length}`"
         @click="selectPhoto(photo, index)"

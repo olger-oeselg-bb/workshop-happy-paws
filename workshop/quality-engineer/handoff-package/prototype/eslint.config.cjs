@@ -26,5 +26,13 @@ module.exports = [
       sourceType: 'module',
       globals: Object.assign({}, globals.browser, { __APP_ENV__: 'readonly' })
     }
+  },
+  {
+    files: ['tests/**/*.js'],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'module',
+      globals: Object.assign({}, globals.browser, globals.jest)
+    }
   }
 ]

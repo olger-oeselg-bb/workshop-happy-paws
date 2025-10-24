@@ -16,7 +16,7 @@
     </header>
 
     <main class="app-main" role="main">
-      <slot />
+      <router-view />
     </main>
 
     <footer class="app-footer" role="contentinfo">
