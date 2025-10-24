@@ -104,7 +104,7 @@ Legend
   - Goal: Provide a Pinia store for toast/alert messaging and modal coordination.
   - Acceptance criteria: `<ToastRegion>` consumes the store, supports multiple variants, and replaces legacy `message`/`toast` refs.
 
-- [ ] FE-TECH-015: Post-migration accessibility audit
+- [x] FE-TECH-015: Post-migration accessibility audit
   - Goal: Validate that the new component architecture maintains or improves accessibility.
   - Acceptance criteria: Documented axe-core (or similar) audit with issues resolved or logged in backlog, including keyboard navigation verification.
 
