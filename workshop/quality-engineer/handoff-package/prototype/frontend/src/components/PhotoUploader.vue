@@ -248,6 +248,7 @@ defineExpose({
 <style scoped>
 .photo-uploader {
   width: 100%;
+  max-width: 400px;
 }
 
 .upload-zone {
