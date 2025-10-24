@@ -4,26 +4,222 @@ This document describes the architecture of the prototype included in this hando
 
 ## High-level overview
 
-- Backend: Node.js + Express running in `server.js`. Responsible for a small REST API and serving the static frontend.
+- Backend: Node.js + Express running in `server.js`. Responsible for a small REST API and serving both the legacy static frontend and the new Vue build.
 - Persistence: lowdb (JSON file) using `db.json` in the prototype folder. Light-weight and file-based for easy reset and inspection.
-- Frontend: Vue 3 (CDN) single-file SPA-like app in `static/` (no build step). Main logic in `static/app.js`, markup in `static/index.html`, styles in `static/styles.css`.
+- Frontend: 
+  - **New (Vue 3 + Vite)**: Modern SPA in `frontend/` using Vite build system, Vue 3 SFC components, and Pinia state management. Runs on port 5173 in development with HMR. Production build outputs to `dist/` and is served by Express.
+  - **Legacy (Vue 3 CDN)**: Original single-file app in `static/` (no build step). Main logic in `static/app.js`, markup in `static/index.html`, styles in `static/styles.css`. Still functional for reference.
+- State Management: Pinia stores (Composition API) for pets data and UI feedback (toasts, modals).
+- Build System: Vite 6.4+ with Vue plugin, HMR, and API proxy to backend during development.
 - Logging: pino is used (module `src/logger.js`) with pretty-print transport in development.
-- Tests: a Playwright E2E test is included under `tests/` (minimal, intended as an example for QEs to extend).
+- Tests: Playwright E2E tests in `tests/` (minimal, intended as an example for QEs to extend) and Vitest unit tests in `src/test/` for Vue components and Pinia stores.
 - Lint/format: ESLint (flat config) + Prettier are configured for fast developer feedback.
 
 ## File layout (important files)
 
-- `server.js` — app entry. Initializes the DB, mounts router at `/api`, serves `static/` folder.
+- `server.js` — app entry. Initializes the DB, mounts router at `/api`, serves `dist/` (Vue build) if available, otherwise falls back to `static/` (legacy).
+- `vite.config.mjs` — Vite configuration with Vue plugin, path aliases, API proxy to backend (port 3000), and build output to `dist/`.
 - `src/db.js` — lowdb wrapper and helper functions (initDb, getPets, getPet, addPet, updatePet, getMedicalRecords, addMedicalRecord, resetDb).
 - `src/router.js` — Express router exposing the REST API under `/api` (GET /pets, GET /pets/:id, POST /pets, PATCH /pets/:id, POST /reset, GET /pets/:id/medical-records, POST /pets/:id/medical-records).
 - `src/logger.js` — pino logger configuration.
 - `db.json` — runtime data file (persistent between runs); can be reset via the API `POST /api/reset`.
-- `static/` — frontend assets:
+- `frontend/` — Modern Vue 3 + Vite frontend:
+  - `index.html` — HTML entry point for Vite build.
+  - `src/main.js` — Vue app initialization with Pinia plugin.
+  - `src/App.vue` — Root component with store demos and toast UI.
+  - `src/stores/` — Pinia stores:
+    - `pets.js` — Pet data management (state, getters, actions for CRUD, filtering).
+    - `ui.js` — UI feedback (toast notifications, modal management, global loading).
+    - `index.js` — Barrel export for stores.
+- `static/` — Legacy frontend assets (Vue 3 CDN):
   - `index.html` — HTML shell that loads Vue from CDN and `static/app.js`.
   - `app.js` — small Vue app with a hash-based router and views: list, add, profile.
   - `styles.css` — styles including status badges and select styles.
-- `tests/` — Playwright tests (example E2E).
-- `package.json` — scripts for `start`, `lint`, `test` and project dependencies.
+- `dist/` — Production build output from Vite (git-ignored, created by `npm run build:frontend`).
+- `tests/` — Playwright E2E tests (example E2E).
+- `src/test/` — Vitest unit tests for Vue components and Pinia stores (setup, components, stores).
+- `package.json` — scripts for `start`, `dev:frontend`, `build:frontend`, `lint`, `test`, `test:unit` and project dependencies.
+
+## Vue 3 Component Architecture
+
+### Component Tree Diagram
+
+```
+App.vue (Root)
+├── AppShell.vue (Layout wrapper)
+│   ├── layouts/AppLayout.vue (Header & navigation)
+│   ├── router-view (Dynamic content)
+│   │   ├── HomeView.vue (Pet listing page)
+│   │   │   ├── PetFilters.vue (Search & filter controls)
+│   │   │   └── PetList.vue (Pet grid)
+│   │   │       └── PetCard.vue (Individual pet card)
+│   │   ├── AddPetView.vue (Add pet form page)
+│   │   │   └── AddPetForm.vue (Pet intake form)
+│   │   │       ├── PhotoUploader.vue (File upload component)
+│   │   │       └── ToastRegion.vue (Feedback messages)
+│   │   └── PetProfileView.vue (Pet details page)
+│   │       ├── PetDetails.vue (Pet information display)
+│   │       ├── PetStatus.vue (Status selector)
+│   │       ├── PhotoGallery.vue (Photo display)
+│   │       ├── MedicalRecords.vue (Medical history)
+│   │       └── ToastRegion.vue (Feedback messages)
+│   └── ToastRegion.vue (Global notifications)
+```
+
+### Component Responsibilities
+
+- **App.vue**: Root component, initializes Pinia stores and router
+- **AppShell.vue**: Layout wrapper providing consistent structure and global UI state
+- **Views**: Route-level components handling page-specific logic and data loading
+- **Components**: Reusable UI components focused on specific functionality
+- **Layouts**: Structural components providing consistent page layouts
+
+### State Management (Pinia)
+
+The application uses Pinia stores with Vue 3 Composition API pattern:
+
+#### Pets Store (`stores/pets.js`)
+- **State**: pets[], activePet, filters{}, loading, error
+- **Getters**: filteredPets (computed), petCount, filteredCount, petsByStatus
+- **Actions**: fetchPets(), fetchPetById(), createPet(), updatePet(), setFilters(), resetFilters()
+- **Usage**: Manages all pet-related data and filtering logic
+
+#### UI Store (`stores/ui.js`)
+- **State**: toasts[], modals[], globalLoading
+- **Actions**: showSuccess(), showError(), showInfo(), clearToast(), showModal(), hideModal()
+- **Usage**: Handles cross-cutting UI concerns like notifications and modal dialogs
+
+#### Medical Records Store (`stores/medicalRecords.js`)
+- **State**: records[], loading, error
+- **Actions**: fetchRecords(), createRecord(), updateRecord(), deleteRecord()
+- **Usage**: Manages medical record CRUD operations
+
+### API Service Layer
+
+Centralized HTTP communication under `src/api/`:
+
+- **http.js**: Base HTTP client with error handling and interceptors
+- **pets.js**: Pet-related API calls (CRUD operations)
+- **medicalRecords.js**: Medical record API calls
+- **index.js**: Service exports and shared utilities
+
+### Router Configuration
+
+Vue Router with history mode and route-level code splitting:
+
+- **/**: HomeView (pet listing with filters)
+- **/add**: AddPetView (pet intake form)
+- **/pet/:id**: PetProfileView (individual pet details)
+
+Router guards ensure data is loaded before route activation and support legacy hash-based navigation.
+
+## Pinia Store Patterns & Best Practices
+
+### Store Structure
+
+All stores follow the Composition API pattern with consistent structure:
+
+```javascript
+import { defineStore } from 'pinia'
+import { ref, computed } from 'vue'
+
+export const useStoreName = defineStore('storeName', () => {
+  // State
+  const state = ref(initialValue)
+  
+  // Getters (computed properties)
+  const computedProperty = computed(() => {
+    return state.value.someCalculation()
+  })
+  
+  // Actions (async functions)
+  const asyncAction = async (params) => {
+    try {
+      // Business logic
+      state.value = newValue
+    } catch (error) {
+      // Error handling
+    }
+  }
+  
+  return {
+    // Exposed state
+    state,
+    // Exposed getters
+    computedProperty,
+    // Exposed actions
+    asyncAction
+  }
+})
+```
+
+### Usage in Components
+
+```javascript
+import { usePetsStore } from '@/stores/pets'
+import { useUIStore } from '@/stores/ui'
+
+export default {
+  setup() {
+    const petsStore = usePetsStore()
+    const uiStore = useUIStore()
+    
+    // Reactive state access
+    const pets = computed(() => petsStore.pets)
+    const loading = computed(() => petsStore.loading)
+    
+    // Actions
+    const loadPets = async () => {
+      try {
+        await petsStore.fetchPets()
+      } catch (error) {
+        uiStore.showError('Failed to load pets')
+      }
+    }
+    
+    return {
+      pets,
+      loading,
+      loadPets
+    }
+  }
+}
+```
+
+### Store Communication
+
+- **Store-to-Store**: Stores can import and use other stores directly
+- **Store-to-API**: Stores call API services for data operations
+- **Store-to-UI**: UI store handles cross-cutting concerns like notifications
+- **Reactive Updates**: All store state is reactive and updates components automatically
+
+### Error Handling
+
+- Actions catch errors and update error state
+- UI store provides user-friendly error notifications
+- Components handle loading states and error display
+- API layer provides consistent error responses
+
+### Testing Stores
+
+Stores are tested with Vitest using mocking for API calls:
+
+```javascript
+import { describe, it, expect, vi } from 'vitest'
+import { setActivePinia, createPinia } from 'pinia'
+import { usePetsStore } from '@/stores/pets'
+
+describe('Pets Store', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia())
+  })
+  
+  it('fetches pets successfully', async () => {
+    const store = usePetsStore()
+    // Mock API and test behavior
+  })
+})
+```
 
 ## API contract (summary)
 
@@ -83,9 +279,12 @@ MedicalRecord
 ## Design decisions & trade-offs
 
 - lowdb (JSON) was chosen for simplicity. It keeps the prototype runnable without installing or configuring a database; it is easy for QEs to inspect and reset data. It is not suitable for production concurrency.
-- Vue via CDN removes build complexity and allows rapid iteration. This keeps the prototype runnable with only Node/npm installed.
+- **Dual frontend approach**: The legacy Vue 3 CDN app (`static/`) remains for reference, while the new Vite-based frontend (`frontend/`) represents the modern architecture. Express serves the Vite build (`dist/`) when available, falling back to `static/` otherwise.
+- **Vite build system**: Provides fast HMR during development, optimized production builds, and a better developer experience with ES modules, SFC components, and proper tooling. The dev server runs on port 5173 and proxies API requests to the Express backend on port 3000.
+- **Pinia for state management**: Uses the Composition API pattern for stores, providing reactive state, computed getters, and actions. The pets store handles data operations while the UI store manages cross-cutting concerns like toasts and modals.
+- **Hybrid module system**: Backend uses CommonJS (`require`/`module.exports`) for compatibility, while the Vite frontend uses ES modules (`import`/`export`). Configuration files like `vite.config.mjs` use `.mjs` extension to enable ES modules without affecting the backend.
 - No authentication or authorization is implemented — the prototype is intended for testing features and flows, not for production security.
-- The UI uses a simple hash-based router (`location.hash`) for predictable navigation in static assets served by Express.
+- The legacy UI uses a simple hash-based router (`location.hash`) for predictable navigation. The new Vite frontend will adopt Vue Router in a future phase.
 
 
 ## Running locally (quick)
@@ -95,13 +294,91 @@ From the prototype folder:
 ```bash
 cd workshop/quality-engineer/handoff-package/prototype
 npm install  # first time only
+
+# Production mode (serves Vite build from dist/)
 npm start
+# Open http://localhost:3000
+
+# Development mode with HMR (recommended for active development)
+npm run dev:frontend  # Terminal 1 - Vite dev server on port 5173
+npm start             # Terminal 2 - Express API server on port 3000
+# Open http://localhost:5173
 ```
-Open http://localhost:3000
 
 Helpful scripts:
+- `npm run dev:frontend` — start Vite dev server with HMR on port 5173
+- `npm run build:frontend` — build production bundle to `dist/`
+- `npm start` — start Express server (serves `dist/` if available, otherwise `static/`)
 - `npm run lint` — run ESLint
-- `npm test` — run Playwright tests (requires Playwright dependencies; see package.json)
+- `npm test` — run Playwright E2E tests (requires Playwright dependencies; see package.json)
+- `npm run test:unit` — run Vitest unit tests for Vue components and Pinia stores
+
+### Development Workflow
+
+1. **Install Dependencies**
+   ```bash
+   npm install
+   ```
+
+2. **Start Development Server**
+   ```bash
+   npm run dev:frontend  # Frontend only (port 5173)
+   npm start             # Full stack (backend + frontend)
+   ```
+
+3. **Run Tests**
+   ```bash
+   npm run test:unit     # Unit tests with Vitest
+   npm run test          # E2E tests with Playwright
+   npm run lint          # ESLint code quality checks
+   ```
+
+4. **Build for Production**
+   ```bash
+   npm run build:frontend  # Build Vue app to dist/
+   ```
+
+### Production Deployment
+
+1. **Build Process**
+   - Vite optimizes and bundles the Vue application
+   - Static assets are processed and minified
+   - Output directory: `frontend/dist/`
+
+2. **Backend Deployment**
+   - Express server serves static files from `frontend/dist/`
+   - API endpoints remain active for data operations
+   - Environment variables configured for production
+
+3. **Static Asset Handling**
+   - Images and uploads stored in `uploads/` directory
+   - Served directly by Express with appropriate headers
+   - Pet photos optimized and cached
+
+### Testing Strategy
+
+#### Unit Testing (Vitest + Vue Test Utils)
+- **Framework**: Vitest with jsdom environment
+- **Coverage**: Components, stores, utilities
+- **Mocking**: Browser APIs, HTTP requests, router
+- **CI Integration**: Runs on every commit
+
+#### E2E Testing (Playwright)
+- **Browser Coverage**: Chrome, Firefox, Safari
+- **Scenarios**: User journeys, form submissions, navigation
+- **CI Integration**: Runs on deployment pipeline
+
+#### Accessibility Testing
+- **Tools**: Vue Test Utils accessibility assertions
+- **Standards**: WCAG 2.1 AA compliance
+- **Coverage**: Color contrast, keyboard navigation, screen reader support
+
+### Code Quality
+
+- **Linting**: ESLint with Vue 3 and test file support
+- **Formatting**: Prettier integration (via ESLint)
+- **Type Checking**: JSDoc annotations for better IDE support
+- **Pre-commit Hooks**: Automated quality checks
 
 
 ## Error modes and edge cases
@@ -114,8 +391,10 @@ Helpful scripts:
 ## How to extend
 
 - Adding endpoints: update `src/router.js` and call db helpers from `src/db.js`.
-- Adding fields: update the frontend `static/app.js` forms and the DB helpers to persist the new fields.
-- Adding tests: add Playwright tests under `tests/` and use `npm test`.
+- Adding Vue components: create `.vue` files in `frontend/src/components/` and import into parent components.
+- Adding Pinia stores: create new store files in `frontend/src/stores/` following the Composition API pattern (see `pets.js` and `ui.js` examples).
+- Adding fields: update the frontend components/stores and the DB helpers to persist the new fields.
+- Adding tests: add Playwright E2E tests under `tests/` and Vitest unit tests under `src/test/` (use `npm test` for E2E, `npm run test:unit` for unit tests).
 - Replacing lowdb: implement a new DB layer in `src/db.js` that follows the existing helper function names (initDb, getPets, addPet...) and swap to a real DB connection.
 
 
@@ -123,8 +402,20 @@ Helpful scripts:
 
 - Use `POST /api/reset` to reset the dataset before a test run.
 - `db.json` can be inspected to verify persisted records.
-- Playwright tests in `tests/` are intentionally minimal — add tests that reflect real QA workflows: create pet, change status, add medical record, and verify persistence.
+- Playwright E2E tests in `tests/` and Vitest unit tests in `src/test/` are included — add tests that reflect real QA workflows: create pet, change status, add medical record, and verify persistence. Unit tests cover Vue components and Pinia stores for regression testing.
+- The Vite dev server (port 5173) is recommended for testing during active development due to HMR. Production builds should be tested via `npm start` (port 3000) after running `npm run build:frontend`.
+- Both frontend versions (legacy `static/` and new `frontend/`) share the same Express API, so backend testing remains consistent.
 
+
+## Rollback Instructions
+
+If issues arise with the Vue 3 + Vite frontend, you can rollback to the legacy frontend:
+
+1. **Delete dist/ directory**: `rm -rf dist/` to remove the Vite build artifacts
+2. **Server will automatically serve static/**: The Express server in `server.js` checks for `dist/index.html` and falls back to `static/` if not found
+3. **Legacy app location**: The original Vue 3 CDN-based app is preserved in `static/app.js`, `static/index.html`, and `static/styles.css`
+
+**Note**: The legacy frontend is functional but lacks the modern architecture, accessibility improvements, and component structure of the Vue 3 + Vite version.
 
 ## Contacts & provenance
 

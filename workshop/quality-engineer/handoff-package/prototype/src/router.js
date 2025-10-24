@@ -61,13 +61,22 @@ router.get('/pets/:id', async (req, res) => {
   }
 })
 
-router.post('/pets', async (req, res) => {
+router.post('/pets', upload.single('photo'), async (req, res) => {
   try {
     const { name, type, breed, age, gender, status, photoUrl } = req.body
-    if (!name || !type || !photoUrl) {
-      return res.status(400).json({ error: 'name, type and photoUrl are required' })
+
+    // Handle photo upload
+    let finalPhotoUrl = photoUrl
+    if (req.file) {
+      // File was uploaded, create URL for it
+      const base = `${req.protocol}://${req.get('host')}`
+      finalPhotoUrl = base + '/uploads/' + path.basename(req.file.path)
     }
-    const pet = await addPet({ name, type, breed: breed || '', age: age || null, gender: gender || 'Unknown', status: status || 'In Shelter', photoUrl })
+
+    if (!name || !type || !finalPhotoUrl) {
+      return res.status(400).json({ error: 'name, type and photo (URL or file) are required' })
+    }
+    const pet = await addPet({ name, type, breed: breed || '', age: age || null, gender: gender || 'Unknown', status: status || 'In Shelter', photoUrl: finalPhotoUrl })
     res.status(201).json(pet)
   } catch (err) {
     logger.error({ err }, 'POST /pets error')

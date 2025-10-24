@@ -5,26 +5,39 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
+    "dev:frontend": "vite",
+    "build:frontend": "vite build",
+    "preview:frontend": "vite preview",
     "test": "npx playwright test",
+    "test:unit": "vitest src/test",
     "lint": "eslint . --ext .js",
     "lint:fix": "eslint . --ext .js --fix",
     "format": "prettier --write ."
   },
   "dependencies": {
     "body-parser": "^2.2.0",
-    "multer": "^2.0.2",
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "lowdb": "^7.0.1",
+    "multer": "^2.0.2",
+    "pinia": "^2.3.1",
     "pino": "^9.11.0",
-    "pino-pretty": "^13.1.1"
+    "pino-pretty": "^13.1.1",
+    "vue-router": "^4.6.3"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.11.0",
     "@playwright/test": "^1.55.1",
+    "@vitejs/plugin-vue": "^5.2.4",
+    "@vue/test-utils": "^2.4.6",
     "eslint": "^9.36.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-node": "^11.1.0",
     "globals": "^16.4.0",
-    "prettier": "^3.6.2"
+    "jsdom": "^27.0.1",
+    "prettier": "^3.6.2",
+    "vite": "^6.4.1",
+    "vitest": "^4.0.2",
+    "vue": "^3.5.22"
   }
 }

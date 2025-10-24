@@ -3,7 +3,7 @@ const globals = require('globals')
 
 module.exports = [
   {
-    ignores: ['node_modules/**', 'db.json', 'static/**', 'coverage/**', '.github/**']
+    ignores: ['node_modules/**', 'db.json', 'static/**', 'coverage/**', '.github/**', 'dist/**']
   },
   {
     files: ['**/*.js'],
@@ -18,5 +18,37 @@ module.exports = [
       'no-undef': 'error',
       'no-console': 'off'
     }
-  }
+  },
+  {
+    files: ['frontend/**/*.js'],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'module',
+      globals: Object.assign({}, globals.browser, { __APP_ENV__: 'readonly' })
+    }
+  },
+  {
+    files: ['src/test/**/*.js'],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'module',
+      globals: Object.assign({}, globals.browser, globals.jest)
+    }
+  },
+  {
+    files: ['**/*.mjs'],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'module',
+      globals: Object.assign({}, globals.node)
+    }
+  },
+  {
+    files: ['tests/**/*.spec.js'],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'module',
+      globals: Object.assign({}, globals.browser, globals.node)
+    }
+  },
 ]
