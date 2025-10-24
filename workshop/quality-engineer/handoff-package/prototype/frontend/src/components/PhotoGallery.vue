@@ -22,7 +22,7 @@
         @keydown.space.prevent="selectPhoto(photo, index)"
       >
         <img
-          :src="photo.url"
+          :src="photo.src"
           :alt="photo.alt || `Photo ${index + 1}`"
           class="photo-thumbnail"
           :class="{ 'is-primary': photo.isPrimary }"
@@ -66,7 +66,7 @@
 
             <div class="lightbox-image-container">
               <img
-                :src="currentPhoto?.url"
+                :src="currentPhoto?.src"
                 :alt="currentPhoto?.alt || `Photo ${currentIndex + 1}`"
                 class="lightbox-image"
               />
