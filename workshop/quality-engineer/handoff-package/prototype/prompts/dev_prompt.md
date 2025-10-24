@@ -12,11 +12,11 @@ These documents contain all vital information about the application you are buil
 
 Workflow Instructions:
 
-1. Before each phase:
-   - Create a **new feature branch** named after the phase (e.g., `feature/<phase-name>`).
+1. Before each phase or user story:
+   - Create a **new feature branch** named after the phase (e.g., `feature/<name>`).
    - If you are on a non-feature branch, expect it to be the integration branch, don't switch to main, base your feature branch on the integration branch.
 
-2. During each phase:
+2. During each phase or user story:
    - Implement the features and changes described in the corresponding tickets.
    - Follow all coding standards, conventions, and practices defined in project documentation.
    - Ensure tests pass and code adheres to architecture and design principles.
