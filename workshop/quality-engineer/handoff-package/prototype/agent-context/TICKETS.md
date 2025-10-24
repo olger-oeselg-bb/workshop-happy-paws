@@ -112,10 +112,6 @@ Legend
   - Goal: Remove monolithic script once Vite-based app reaches parity.
   - Acceptance criteria: Build artifacts served by Express, legacy file deleted, and rollback instructions noted in docs.
 
-- [ ] FE-TECH-017: Create TypeScript adoption ADR (optional)
-  - Goal: Decide whether to adopt TypeScript during refactor.
-  - Acceptance criteria: ADR file summarizes decision, trade-offs, and onboarding steps; codebase aligns with chosen direction.
-
 - [ ] FE-TEST-001: Add component unit test coverage
   - Goal: Introduce Vitest + Vue Test Utils for critical components (e.g., PetList, MedicalRecords, StatusSelect).
   - Acceptance criteria: Test suite runs via `npm run test:unit`, covers happy paths and edge cases, and integrates with CI.
