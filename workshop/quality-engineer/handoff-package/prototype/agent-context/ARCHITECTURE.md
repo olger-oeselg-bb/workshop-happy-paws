@@ -157,6 +157,16 @@ Helpful scripts:
 - Both frontend versions (legacy `static/` and new `frontend/`) share the same Express API, so backend testing remains consistent.
 
 
+## Rollback Instructions
+
+If issues arise with the Vue 3 + Vite frontend, you can rollback to the legacy frontend:
+
+1. **Delete dist/ directory**: `rm -rf dist/` to remove the Vite build artifacts
+2. **Server will automatically serve static/**: The Express server in `server.js` checks for `dist/index.html` and falls back to `static/` if not found
+3. **Legacy app location**: The original Vue 3 CDN-based app is preserved in `static/app.js`, `static/index.html`, and `static/styles.css`
+
+**Note**: The legacy frontend is functional but lacks the modern architecture, accessibility improvements, and component structure of the Vue 3 + Vite version.
+
 ## Contacts & provenance
 
 This prototype was produced from Business Analyst interview artifacts (user stories and wireframes) as part of the workshop materials. See `workshop/` for the BA artifacts and `workshop/quality-engineer/handoff-package/` for handoff docs.
