@@ -96,9 +96,11 @@ export async function apiGet(url, params = {}) {
  * @returns {Promise<object>} - Parsed JSON response
  */
 export async function apiPost(url, data = {}) {
+  const isFormData = data instanceof FormData;
   return apiFetch(url, {
     method: 'POST',
-    body: JSON.stringify(data)
+    body: isFormData ? data : JSON.stringify(data),
+    headers: isFormData ? {} : undefined // Let browser set Content-Type for FormData
   });
 }
 

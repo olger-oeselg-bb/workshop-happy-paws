@@ -32,6 +32,7 @@
 
 <script setup>
 import { storeToRefs } from 'pinia';
+import { onMounted } from 'vue';
 import { usePetsStore, useUIStore } from '@/stores';
 import PetCard from '@/components/PetCard.vue';
 
@@ -39,6 +40,11 @@ const petsStore = usePetsStore();
 const uiStore = useUIStore();
 
 const { filteredPets, petCount, filteredCount, loading, error } = storeToRefs(petsStore);
+
+// Fetch pets on component mount
+onMounted(() => {
+  petsStore.fetchPets();
+});
 
 async function refresh() {
   try {

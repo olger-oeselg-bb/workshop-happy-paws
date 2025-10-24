@@ -9,12 +9,12 @@
       <p class="empty-text">No photos available</p>
     </div>
 
-    <div v-else class="photos-grid" role="grid">
+    <div v-else class="photos-grid" role="list">
       <div
         v-for="(photo, index) in photos"
         :key="photo.id || index"
         class="photo-item"
-        role="gridcell"
+        role="listitem"
         tabindex="0"
         :aria-label="`Photo ${index + 1} of ${photos.length}`"
         @click="selectPhoto(photo, index)"
@@ -22,7 +22,7 @@
         @keydown.space.prevent="selectPhoto(photo, index)"
       >
         <img
-          :src="photo.url"
+          :src="photo.src"
           :alt="photo.alt || `Photo ${index + 1}`"
           class="photo-thumbnail"
           :class="{ 'is-primary': photo.isPrimary }"
@@ -66,7 +66,7 @@
 
             <div class="lightbox-image-container">
               <img
-                :src="currentPhoto?.url"
+                :src="currentPhoto?.src"
                 :alt="currentPhoto?.alt || `Photo ${currentIndex + 1}`"
                 class="lightbox-image"
               />

@@ -46,10 +46,60 @@
         </select>
       </label>
 
-      <label class="field">
-        <span class="field-label">Photo URL</span>
-        <input v-model.trim="form.photoUrl" type="url" name="photoUrl" placeholder="https://…" />
-      </label>
+      <fieldset class="photo-fieldset">
+        <legend class="field-label">Photo</legend>
+
+        <div class="photo-options">
+          <label class="radio-option">
+            <input
+              v-model="photoMethod"
+              type="radio"
+              value="url"
+              name="photoMethod"
+            />
+            <span>Photo URL</span>
+          </label>
+
+          <label class="radio-option">
+            <input
+              v-model="photoMethod"
+              type="radio"
+              value="upload"
+              name="photoMethod"
+            />
+            <span>Upload Photo</span>
+          </label>
+        </div>
+
+        <div v-if="photoMethod === 'url'" class="photo-input">
+          <label class="field">
+            <span class="field-label">Photo URL <sup aria-hidden="true">*</sup></span>
+            <input
+              v-model.trim="form.photoUrl"
+              type="url"
+              name="photoUrl"
+              placeholder="https://…"
+              required
+              aria-describedby="photo-error"
+            />
+          </label>
+        </div>
+
+        <div v-else-if="photoMethod === 'upload'" class="photo-input">
+          <PhotoUploader
+            :accept="'image/*'"
+            :max-size="10 * 1024 * 1024"
+            :primary-text="'Drop photo here or click to browse'"
+            :secondary-text="'Supports JPG, PNG, GIF up to 10MB'"
+            :button-text="'Choose Photo'"
+            @files-selected="handlePhotoSelected"
+          />
+          <div v-if="selectedPhoto" class="selected-photo">
+            <p>Selected: {{ selectedPhoto.name }}</p>
+            <button type="button" class="link" @click="clearPhoto">Remove</button>
+          </div>
+        </div>
+      </fieldset>
     </fieldset>
 
     <div v-if="errors.length" class="form-errors" role="alert" aria-live="polite">
@@ -73,6 +123,7 @@
 <script setup>
 import { reactive, ref } from 'vue';
 import { defineEmits, defineProps } from 'vue';
+import PhotoUploader from '@/components/PhotoUploader.vue';
 
 const props = defineProps({
   saving: {
@@ -84,6 +135,8 @@ const props = defineProps({
 const emit = defineEmits(['submit']);
 
 const errors = ref([]);
+const photoMethod = ref('url');
+const selectedPhoto = ref(null);
 
 const defaultForm = {
   name: '',
@@ -105,8 +158,16 @@ function validate() {
   if (!form.type) {
     issues.push('Type is required.');
   }
-  if (form.photoUrl && !/^https?:\/\//i.test(form.photoUrl)) {
-    issues.push('Photo URL must start with http:// or https://.');
+  if (photoMethod.value === 'url') {
+    if (!form.photoUrl) {
+      issues.push('Photo URL is required.');
+    } else if (!/^https?:\/\//i.test(form.photoUrl)) {
+      issues.push('Photo URL must start with http:// or https://.');
+    }
+  } else if (photoMethod.value === 'upload') {
+    if (!selectedPhoto.value) {
+      issues.push('Photo file is required.');
+    }
   }
   if (form.age && Number(form.age) < 0) {
     issues.push('Age must be positive.');
@@ -116,6 +177,8 @@ function validate() {
 
 function resetForm() {
   Object.assign(form, defaultForm);
+  photoMethod.value = 'url';
+  selectedPhoto.value = null;
   errors.value = [];
 }
 
@@ -125,17 +188,31 @@ function handleSubmit() {
     return;
   }
 
-  const payload = {
-    name: form.name,
-    type: form.type,
-    breed: form.breed,
-    age: form.age,
-    gender: form.gender,
-    status: form.status,
-    photoUrl: form.photoUrl
-  };
+  const payload = new FormData();
+  payload.append('name', form.name);
+  payload.append('type', form.type);
+  payload.append('breed', form.breed);
+  payload.append('age', form.age);
+  payload.append('gender', form.gender);
+  payload.append('status', form.status);
+
+  if (photoMethod.value === 'url') {
+    payload.append('photoUrl', form.photoUrl);
+  } else if (photoMethod.value === 'upload' && selectedPhoto.value) {
+    payload.append('photo', selectedPhoto.value);
+  }
 
   emit('submit', payload);
+}
+
+function handlePhotoSelected(files) {
+  if (files.length > 0) {
+    selectedPhoto.value = files[0];
+  }
+}
+
+function clearPhoto() {
+  selectedPhoto.value = null;
 }
 </script>
 
@@ -272,5 +349,50 @@ fieldset {
 .secondary:disabled {
   color: #a0aec0;
   cursor: not-allowed;
+}
+
+.photo-fieldset {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1rem;
+  background: #f9fafb;
+}
+
+.photo-options {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.radio-option input[type="radio"] {
+  margin: 0;
+}
+
+.photo-input {
+  margin-top: 0.5rem;
+}
+
+.selected-photo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  margin-top: 0.5rem;
+}
+
+.selected-photo p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #374151;
 }
 </style>
