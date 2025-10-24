@@ -55,6 +55,8 @@ As a **Business Analyst**, your role is to analyze raw stakeholder interviews an
   - Benefits for stakeholders (efficiency, transparency, trust)  
 - Presentation should be **non-technical, easy to understand**, and persuasive.  
 
+Learn more about prompting from the [Prompting Guide](./ba-prompting-guide.md)
+
 ---
 
 ## Deliverables

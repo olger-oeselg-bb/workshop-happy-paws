@@ -134,7 +134,7 @@ Validate the completeness and clarity of your analysis.
 
 ## Example Comprehensive Prompt
 
-> “You are acting as a system analyst. Based on these user stories for the Happy Paws Pet Registry System (pet intake, adoption workflow, medical record tracking), create:
+> “You are acting as a senior system analyst. Based on these user stories for the Happy Paws Pet Registry System (pet intake, adoption workflow, medical record tracking), create:
 > - a system context diagram showing main actors and data flows,  
 > - a logical architecture (frontend, backend, database),  
 > - an entity relationship model,  
