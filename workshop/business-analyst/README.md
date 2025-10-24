@@ -7,9 +7,9 @@
 **Workshop Role:** Business Analyst (BA)  
 **Audience:** Business Analysts in training workshop  
 **Objective:** Practice requirements gathering, story writing, acceptance criteria, and visualization skills using real-world style stakeholder input.  
-**Using AI Assistant:** Microsoft 365 Copilot Chat (in Teams)
+**Using AI Assistant:** Microsoft 365 Copilot Chat (in Teams) or local. You can also use something else in workshop setting and propose tools.
 
-Happy Paws Shelter is a growing nonprofit animal shelter struggling with fragmented processes. They use spreadsheets, paper notes, and manual communication to manage pets, volunteers, adopters, and medical partners.  
+The Happy Paws Animal Shelter is a growing nonprofit animal shelter struggling with fragmented processes. They use spreadsheets, paper notes, and manual communication to manage pets, volunteers, adopters, and medical partners.
 The board has requested a **Pet Registry System** to make operations more efficient, improve adoption rates, and increase transparency.  
 
 As a **Business Analyst**, your role is to analyze raw stakeholder interviews and transform them into clear, actionable artifacts that can be handed off to engineering and quality teams.  
@@ -54,6 +54,8 @@ As a **Business Analyst**, your role is to analyze raw stakeholder interviews an
   - Key features / MVP scope  
   - Benefits for stakeholders (efficiency, transparency, trust)  
 - Presentation should be **non-technical, easy to understand**, and persuasive.  
+
+Learn more about prompting from the [Prompting Guide](./ba-prompting-guide.md)
 
 ---
 

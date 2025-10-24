@@ -18,8 +18,8 @@ As a **Software Engineer**, your task is to take these artifacts and **design an
 
 ## Instructions for Software Engineer Role
 
-### 1. Review BA Deliverables
-- Go through the **user stories, acceptance criteria, and visuals** created by the Business Analyst role.  
+### 1. Review BA Deliverables: the handoff package
+- Go through the **user stories, acceptance criteria, wireframes and MVP scope** created by the Business Analyst role.
 - Clarify scope: which features should be part of the **MVP (Minimum Viable Product)**?  
 - Prioritize core workflows:  
   - Pet intake and profile management  
