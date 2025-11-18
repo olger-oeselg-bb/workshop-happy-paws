@@ -10,6 +10,9 @@ export default defineConfig({
   build: {
     outDir: '../dist',
     emptyOutDir: true,
+    minify: false,
+    sourcemap: true,
+    cssCodeSplit: false,
     rollupOptions: {
       input: {
         main: fileURLToPath(new URL('./frontend/index.html', import.meta.url))

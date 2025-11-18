@@ -239,6 +239,15 @@ function cancelEdit() {
   editingRecord.value = null;
 }
 
+function clearMedicalRecordForm() {
+  newRecord.value = {
+    notes: '',
+    vet: '',
+    date: new Date().toISOString().split('T')[0],
+    type: 'note'
+  };
+}
+
 async function saveEdit() {
   if (!editingRecord.value) return;
 
@@ -270,16 +279,18 @@ async function confirmDelete(record) {
 
 async function addRecord() {
   if (isSubmitting.value) return;
-
   isSubmitting.value = true;
+
   try {
-    const record = await medicalRecordsStore.createMedicalRecord(props.petId, newRecord.value);
-    newRecord.value = {
-      notes: '',
-      vet: '',
-      date: new Date().toISOString().split('T')[0],
-      type: 'note'
-    };
+    const payload = new FormData();
+    payload.append('notes', newRecord.value.notes);
+    payload.append('vet', newRecord.value.vet);
+    payload.append('date', newRecord.value.date);
+    payload.append('type', newRecord.value.type);
+
+    const record = await medicalRecordsStore.createMedicalRecord(props.petId, payload);
+
+    clearMedicalRecordForm();
     uiStore.showSuccess('Medical record added successfully');
     emit('record-added', record);
   } catch (err) {

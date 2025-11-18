@@ -120,9 +120,17 @@ Legend
   - Goal: Reflect new tooling, component structure, and state management approach in `ARCHITECTURE.md`.
   - Acceptance criteria: Document includes component tree diagram, build/deploy steps, and notes on Pinia usage.
 
+- [ ] FE-TECH-017: Improve current http calls from front-end to backend.
+  - Goal: Replace http.js with axios library
+  - Acceptance criteria:
+    - Use and configure axios library to do all http calls from front-end towards backend server.
+    - Document this change as well.
+
 ---
 
 ## Improvements & Tech debt (observations during development)
+
+- Improve front-end http layer, use axios instead of custom layer
 
 - Improve status selector UX
   - Done (profile select styled) — but consider adding a small transition when badge changes, and make the select keyboard-friendly with clearer focus outline (aria attributes). Priority: low.
