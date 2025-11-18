@@ -21,7 +21,14 @@ export default defineConfig({
     proxy: {
       '/api': {
         target: 'http://localhost:3000',
-        changeOrigin: true
+        changeOrigin: true,
+        configure: (proxy, options) => {
+          proxy.on('proxyReq', (proxyReq, req, res) => {
+            if (req.method === 'POST' || req.method === 'PATCH') {
+              proxyReq.setHeader('Content-Type', 'application/json');
+            }
+          });
+        }
       }
     }
   },

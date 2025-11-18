@@ -8,6 +8,7 @@ const logger = require('./src/logger')
 const app = express()
 app.use(cors())
 app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true }))
 const fs = require('fs')
 
 // ensure uploads directory exists and serve it

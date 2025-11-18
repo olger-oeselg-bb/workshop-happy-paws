@@ -23,6 +23,7 @@
               <label for="edit-notes">Notes</label>
               <textarea
                 id="edit-notes"
+                name="notes"
                 v-model="editingRecord.notes"
                 rows="3"
                 aria-label="Medical record notes"
@@ -32,6 +33,7 @@
               <label for="edit-vet">Vet</label>
               <input
                 id="edit-vet"
+                name="vet"
                 v-model="editingRecord.vet"
                 type="text"
                 aria-label="Veterinarian name"
@@ -41,6 +43,7 @@
               <label for="edit-date">Date</label>
               <input
                 id="edit-date"
+                name="date"
                 v-model="editingRecord.date"
                 type="date"
                 aria-label="Medical record date"
@@ -50,6 +53,7 @@
               <label for="edit-type">Type</label>
               <select
                 id="edit-type"
+                name="type"
                 v-model="editingRecord.type"
                 aria-label="Medical record type"
               >
@@ -113,6 +117,7 @@
             <label for="new-notes">Notes</label>
             <textarea
               id="new-notes"
+              name="notes"
               v-model="newRecord.notes"
               rows="3"
               required
@@ -123,6 +128,7 @@
             <label for="new-vet">Vet</label>
             <input
               id="new-vet"
+              name="vet"
               v-model="newRecord.vet"
               type="text"
               required
@@ -133,6 +139,7 @@
             <label for="new-date">Date</label>
             <input
               id="new-date"
+              name="date"
               v-model="newRecord.date"
               type="date"
               required
@@ -143,6 +150,7 @@
             <label for="new-type">Type</label>
             <select
               id="new-type"
+              name="type"
               v-model="newRecord.type"
               required
               aria-label="Medical record type"
@@ -154,12 +162,12 @@
             </select>
           </div>
           <div class="actions">
-            <button
-              type="submit"
-              class="btn-primary"
-              :disabled="isSubmitting"
-              aria-label="Add a new medical record"
-            >
+              <button
+                type="submit"
+                class="btn-primary"
+                :disabled="isSubmitting"
+                aria-label="Add a new medical record"
+              >
               {{ isSubmitting ? 'Adding...' : 'Add Record' }}
             </button>
           </div>
