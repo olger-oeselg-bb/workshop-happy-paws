@@ -120,7 +120,7 @@ Legend
   - Goal: Reflect new tooling, component structure, and state management approach in `ARCHITECTURE.md`.
   - Acceptance criteria: Document includes component tree diagram, build/deploy steps, and notes on Pinia usage.
 
-- [ ] FE-TECH-017: Improve current http calls from front-end to backend.
+- [x] FE-TECH-017: Improve current http calls from front-end to backend.
   - Goal: Replace http.js with axios library
   - Acceptance criteria:
     - Use and configure axios library to do all http calls from front-end towards backend server.
