@@ -98,7 +98,7 @@ The application uses Pinia stores with Vue 3 Composition API pattern:
 
 Centralized HTTP communication under `src/api/`:
 
-- **http.js**: Base HTTP client with error handling and interceptors
+- **http.js**: Axios-based HTTP client with shared configuration, JSON/FormData support, and consistent error handling via `ApiError`
 - **pets.js**: Pet-related API calls (CRUD operations)
 - **medicalRecords.js**: Medical record API calls
 - **index.js**: Service exports and shared utilities
